@@ -1,0 +1,9 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/@internal/prisma-second/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("AZURE_POSTGRES_URL")
+}
