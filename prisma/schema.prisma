@@ -15,8 +15,9 @@ datasource db {
 }
 
 model Ticket {
-  id_ticket Int       @id @default(autoincrement())
+  id_ticket String    @id @default(cuid())
   tipo      Tipo
+  area      TipoPregunta
   estado    Estado
   prioridad Prioridad
 
@@ -27,10 +28,28 @@ model Ticket {
 
   respuesta String? @db.Text
 
+  comentarios TicketComentario[]
+
   id_user String
   user    User   @relation(fields: [id_user], references: [id])
 
+  id_support String?
+  support    UserSupport? @relation(fields: [id_support], references: [id_support])
+
   @@index([id_user])
+  @@index([id_support])
+}
+
+model TicketComentario {
+  id_comentario Int @id @default(autoincrement())
+
+  id_ticket String
+  ticket    Ticket @relation(fields: [id_ticket], references: [id_ticket])
+
+  comentario String   @db.Text
+  fecha      DateTime
+
+  @@index([id_ticket])
 }
 
 enum Tipo {
@@ -60,4 +79,49 @@ model User {
   email     String
 
   tickets Ticket[]
+}
+
+model UserSupport {
+  id_support String @id @default(uuid())
+  nombre     String
+  apellidos  String
+  email      String
+
+  id_user String? @unique
+
+  tickets Ticket[]
+}
+
+model RespuestasFaq {
+  id_faqRespuesta Int @id @default(autoincrement())
+
+  id_prefrec Int
+  pregunta   PreguntasFrecuentes @relation(fields: [id_prefrec], references: [id_prefrec])
+
+  respuesta String
+
+  @@index([id_prefrec])
+}
+
+model PreguntasFrecuentes {
+  id_prefrec Int @id @default(autoincrement())
+
+  pregunta String
+
+  respuestas RespuestasFaq[]
+  tipo       TipoPregunta    @default(GENERAL)
+}
+
+enum TipoPregunta {
+  GENERAL
+  CUENTA
+  NEGOCIO
+  CLIENTE
+  DUENONEGOCIO
+  ORDENES
+  PRODUCTOS
+  INVENTARIO
+  CHAT
+  PUBLICACIONES
+  TECNICO
 }

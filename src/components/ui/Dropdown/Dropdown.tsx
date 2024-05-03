@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useContext } from "react";
+import { FC } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { SUCCESS_TOAST, showToast } from "@/components/ui/toast";
 
@@ -12,15 +12,8 @@ import {
   DropdownSection,
   Button,
 } from "@nextui-org/react";
-import { FaBoxOpen, FaRegUserCircle } from "react-icons/fa";
-import {
-  MdOutlineDashboard,
-  MdOutlineInventory2,
-  MdOutlineLogin,
-  MdOutlineLogout,
-  MdOutlinePersonAdd,
-  MdOutlineSettings,
-} from "react-icons/md";
+import { FaRegUserCircle } from "react-icons/fa";
+import { MdOutlineLogout, MdOutlineSettings } from "react-icons/md";
 
 export const DropdownComponent: FC = () => {
   const { data: session } = useSession();
@@ -33,39 +26,31 @@ export const DropdownComponent: FC = () => {
             <FaRegUserCircle size={20} />
           </Button>
         </DropdownTrigger>
-        <DropdownMenu>
+        <DropdownMenu variant="flat">
           <DropdownSection>
-            {session ? (
-              <>
-                <DropdownItem startContent={<MdOutlineDashboard />}>
-                  <a href="/dashboard">Dashboard</a>
-                </DropdownItem>
-                <DropdownItem startContent={<MdOutlineInventory2 />}>
-                  <a href="/inventory">Inventory</a>
-                </DropdownItem>
-                <DropdownItem startContent={<MdOutlineSettings />}>
-                  <a href="/settings">Settings</a>
-                </DropdownItem>
-                <DropdownItem
-                  startContent={<MdOutlineLogout />}
-                  onClick={async () => {
-                    await signOut();
-                    showToast("Signed out successfully", SUCCESS_TOAST);
-                  }}
-                >
-                  Sign Out
-                </DropdownItem>
-              </>
-            ) : (
-              <>
-                <DropdownItem startContent={<MdOutlineLogin />}>
-                  <a href="/auth/login">Sign In</a>
-                </DropdownItem>
-                <DropdownItem startContent={<MdOutlinePersonAdd />}>
-                  <a href="/auth/register">Register</a>
-                </DropdownItem>
-              </>
-            )}
+            <DropdownItem key="profile" className="h-14 gap-2">
+              <p className="font-semibold">Inicio sesión como:</p>
+              <p className="font-semibold">{session?.user.email}</p>
+            </DropdownItem>
+            <DropdownItem
+              href={`${process.env.NEXT_PUBLIC_APP_URL}/user/profile/${session?.user.id}`}
+              key="settings"
+              startContent={<MdOutlineSettings size={20} />}
+            >
+              Cuenta
+            </DropdownItem>
+            <DropdownItem
+              key="logout"
+              color="danger"
+              onClick={() => {
+                signOut().then(async () => {
+                  showToast("Logout Successful", SUCCESS_TOAST);
+                });
+              }}
+              startContent={<MdOutlineLogout size={20} />}
+            >
+              Cerrar sesión
+            </DropdownItem>
           </DropdownSection>
         </DropdownMenu>
       </Dropdown>

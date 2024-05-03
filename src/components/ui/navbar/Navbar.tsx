@@ -1,56 +1,67 @@
 "use client";
 
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { DropdownComponent, DarkModeSwitch } from "@/components";
-import { useSession } from "next-auth/react";
 import { UiContext } from "@/context/ui";
 import {
   Navbar,
-  NavbarBrand,
   NavbarContent,
   NavbarItem,
-  NavbarMenuToggle,
-  NavbarMenu,
-  NavbarMenuItem,
   Link,
-  Badge,
-  Image,
-  Button,
 } from "@nextui-org/react";
-import { useTheme as useNextTheme } from "next-themes";
-import { FaShoppingBag } from "react-icons/fa";
 
-export const NavbarComponent = () => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { data: session } = useSession();
+interface Props {
+  children: React.ReactNode;
+}
+
+export const NavbarWrapper = ({ children }: Props) => {
   const { toggleSideMenu } = useContext(UiContext);
-  const { resolvedTheme } = useNextTheme();
 
   return (
-    <>
+    <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
       <Navbar
-        onMenuOpenChange={setMobileMenuOpen}
         isBordered
-        className="fixed"
-        maxWidth="xl"
+        className="w-full"
+        classNames={{
+          wrapper: "w-full max-w-full",
+        }}
       >
-        <NavbarContent>
-          <NavbarItem>
-            <NavbarMenuToggle />
-          </NavbarItem>
-          <NavbarBrand>
-            <Link href="/">
-              <Image
-                src="/logo.png"
-                alt="Logo"
-                width={100}
-                height={40}
-                loading="lazy"
+        <NavbarContent className="md:hidden">
+          <button onClick={toggleSideMenu} className="md:hidden">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
               />
+            </svg>
+          </button>
+        </NavbarContent>
+        <NavbarContent className="w-full max-md:hidden">
+          <NavbarItem>
+            <Link href={"/"} color="foreground">
+              Inicio
             </Link>
-          </NavbarBrand>
+          </NavbarItem>
+        </NavbarContent>
+        <NavbarContent
+          justify="end"
+          className="w-fit data-[justify=end]:flex-grow-0"
+        >
+          <DarkModeSwitch />
+          <NavbarContent>
+            <DropdownComponent />
+          </NavbarContent>
         </NavbarContent>
       </Navbar>
-    </>
+      {children}
+    </div>
   );
 };

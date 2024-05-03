@@ -1,7 +1,7 @@
 "use server";
 
 import bcrypt from "bcrypt";
-import { client } from "@/database";
+import prisma2 from "@/lib/prisma-second";
 
 export const oAuthToDb = async (
   oAuthEmail: string,
@@ -10,26 +10,45 @@ export const oAuthToDb = async (
   oAuthGivenName?: string,
   oAuthFamilyName?: string
 ) => {
-  await client.connect();
-  const user = await client.query(
-    "SELECT * FROM m_user WHERE email = $1 INNER JOIN duenonegocio ON m_user.id = duenonegocio.id_user INNER JOIN negocio ON duenonegocio.id_negocio = negocio.id INNER JOIN inventario ON negocio.id = inventario.id_negocio INNER JOIN cliente ON m_user.id = cliente.id_user INNER JOIN historial ON cliente.id = historial.id_cliente",
-    [oAuthEmail]
-  );
-  await client.end();
+  const user = await prisma2.m_user.findUnique({
+    where: {
+      email: oAuthEmail,
+    },
+    include: {
+      duenonegocio: {
+        include: {
+          negocio: {
+            include: {
+              inventario: {
+                select: {
+                  id_inventario: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      cliente: {
+        include: {
+          historial: true,
+        },
+      },
+    },
+  });
 
   const [name, lastName] = oAuthName?.split(" ") || ["", ""];
 
   if (user) {
-    const userId = user.rows[0].id;
-    const row = user.rows[0];
-
-    await client.connect();
-    await client.query(
-      "UPDATE m_user SET email = $1, emailVerified = $2, oAuthId = $3 WHERE id = $4",
-      [oAuthEmail, true, oAuthProviderAccountId, userId]
-    );
-    await client.end();
-
+    await prisma2.m_user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        email: oAuthEmail,
+        emailVerified: true,
+        oAuthId: oAuthProviderAccountId,
+      },
+    });
     const {
       id,
       email,
@@ -39,7 +58,7 @@ export const oAuthToDb = async (
       oAuthId,
       duenonegocio,
       cliente,
-    } = row;
+    } = user;
     if (id_rol === 4) {
       return {
         id,
@@ -75,14 +94,17 @@ export const oAuthToDb = async (
   const salt = bcrypt.genSaltSync(10);
   const hash = bcrypt.hashSync(password, salt) as string;
 
-  await client.connect();
-  const newUser = await client.query(
-    "INSERT INTO m_user(email, password, emailVerified, oAuthId, id_rol) VALUES($1, $2, $3, $4, $5) RETURNING *",
-    [oAuthEmail, hash, true, oAuthProviderAccountId, role === 1 ? 1 : 4]
-  );
-  await client.end();
+  const newUser = await prisma2.m_user.create({
+    data: {
+      email: oAuthEmail,
+      password: hash,
+      emailVerified: true,
+      oAuthId: oAuthProviderAccountId,
+      id_rol: role === 1 ? 1 : 4,
+    },
+  });
 
-  const { email, id_rol, id, oAuthId } = newUser.rows[0];
+  const { email, id_rol, id, oAuthId } = newUser;
   return {
     id,
     email,
