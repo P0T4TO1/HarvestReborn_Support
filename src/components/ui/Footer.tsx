@@ -36,15 +36,7 @@ export const Footer = () => {
               </div>
               <div>
                 <p className="mt-6 text-sm text-blueGray-500">
-                  Built by{" "}
-                  <Link
-                    href={"https://github.com/P0T4TO1"}
-                    target="_blank"
-                    color="foreground"
-                  >
-                    Jaret García
-                  </Link>
-                  , Xavier Chanona
+                  Built by Jaret García, Xavier Chanona
                 </p>
                 <p className="mt-6 text-sm text-blueGray-500">
                   Built with{" "}
@@ -56,7 +48,9 @@ export const Footer = () => {
                     NextUI
                   </Link>{" "}
                   <Link
-                    href={"https://github.com/nextui-org/nextui/blob/main/LICENSE"}
+                    href={
+                      "https://github.com/nextui-org/nextui/blob/main/LICENSE"
+                    }
                     target="_blank"
                     color="foreground"
                   >
@@ -75,7 +69,7 @@ export const Footer = () => {
                     <li>
                       <Link
                         className="font-semibold mb-2 text-sm"
-                        href={"/"}
+                        href={process.env.NEXT_PUBLIC_APP_URL}
                         color="foreground"
                       >
                         Inicio
@@ -84,7 +78,7 @@ export const Footer = () => {
                     <li>
                       <Link
                         className="font-semibold mb-2 text-sm"
-                        href={"/negocios"}
+                        href={`${process.env.NEXT_PUBLIC_APP_URL}/negocios`}
                         color="foreground"
                       >
                         Recauderías
@@ -93,7 +87,7 @@ export const Footer = () => {
                     <li>
                       <Link
                         className="font-semibold mb-2 text-sm"
-                        href="/#aboutUs"
+                        href={`${process.env.NEXT_PUBLIC_APP_URL}/#aboutUs`}
                         color="foreground"
                       >
                         Acerca de nosotros
@@ -118,7 +112,7 @@ export const Footer = () => {
                     <li>
                       <Link
                         className="font-semibold mb-2 text-sm"
-                        href={"/terms-conditions"}
+                        href={`${process.env.NEXT_PUBLIC_APP_URL}/terms-conditions`}
                         color="foreground"
                       >
                         Términos y condiciones
@@ -127,7 +121,7 @@ export const Footer = () => {
                     <li>
                       <Link
                         className="font-semibold mb-2 text-sm"
-                        href={"/privacy-policy"}
+                        href={`${process.env.NEXT_PUBLIC_APP_URL}/privacy-policy`}
                         color="foreground"
                       >
                         Aviso de privacidad
