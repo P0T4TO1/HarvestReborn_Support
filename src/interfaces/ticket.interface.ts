@@ -1,4 +1,4 @@
-import { TipoPregunta } from "@/interfaces";
+import { IUser, TipoPregunta } from "@/interfaces";
 
 export interface ITicket {
   id_ticket: string;
@@ -18,6 +18,7 @@ export interface ITicket {
 
   id_user: string;
   id_user_soporte: string;
+  user_soporte: IUser;
 }
 
 export enum Tipo {

@@ -2,7 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import prisma2 from "@/lib/prisma-second";
 import { today, getLocalTimeZone } from "@internationalized/date";
-import { Prioridad, Tipo, TipoPregunta } from "@/interfaces";
+import { Prioridad, Tipo, TipoPregunta, ITicket } from "@/interfaces";
+
+import { NewTicketNotification } from "@/components";
+import sgMail from "@sendgrid/mail";
+import { render } from "@react-email/render";
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY || "");
 
 interface Data {
   tipo: Tipo;
@@ -20,6 +26,20 @@ async function createTicket(req: NextRequest, res: NextResponse) {
     const user = await prisma2.m_user.findUnique({
       where: {
         id: id_user,
+      },
+      include: {
+        duenonegocio: {
+          select: {
+            nombre_dueneg: true,
+            apellidos_dueneg: true,
+          },
+        },
+        cliente: {
+          select: {
+            nombre_cliente: true,
+            apellidos_cliente: true,
+          },
+        },
       },
     });
 
@@ -54,6 +74,37 @@ async function createTicket(req: NextRequest, res: NextResponse) {
         id_user: user.id,
       },
     });
+
+    const name =
+      user.cliente?.nombre_cliente + " " + user.cliente?.apellidos_cliente ||
+      user.duenonegocio?.nombre_dueneg +
+        " " +
+        user.duenonegocio?.apellidos_dueneg;
+
+    const emailHtml = render(
+      NewTicketNotification({
+        email: user.email,
+        userName: name,
+        ticket: ticket as unknown as ITicket,
+      })
+    );
+
+    const msg = {
+      to: user.email,
+      from: "Support<harvestreborn@gmail.com>",
+      subject: "Nuevo ticket creado",
+      html: emailHtml,
+    };
+
+    try {
+      await sgMail.send(msg);
+    } catch (error) {
+      console.error(error);
+      return NextResponse.json(
+        { message: "Error al enviar el correo" },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json(ticket, { status: 201 });
   } catch (error) {
