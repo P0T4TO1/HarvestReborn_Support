@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import prisma2 from "@/lib/prisma-second";
 import { today, getLocalTimeZone } from "@internationalized/date";
 import { Prioridad, Tipo, TipoPregunta, ITicket } from "@/interfaces";
 
@@ -11,45 +10,16 @@ import { render } from "@react-email/render";
 sgMail.setApiKey(process.env.SENDGRID_API_KEY || "");
 
 interface Data {
+  email: string;
   tipo: Tipo;
-  area: TipoPregunta;
   motivo: string;
   descripcion: string;
-  id_user: string;
 }
 
-async function createTicket(req: NextRequest, res: NextResponse) {
-  const { tipo, motivo, area, descripcion, id_user } =
-    (await req.json()) as Data;
+async function createGuestTicket(req: NextRequest) {
+  const { email, tipo, motivo, descripcion } = (await req.json()) as Data;
 
   try {
-    const user = await prisma2.m_user.findUnique({
-      where: {
-        id: id_user,
-      },
-      include: {
-        duenonegocio: {
-          select: {
-            nombre_dueneg: true,
-            apellidos_dueneg: true,
-          },
-        },
-        cliente: {
-          select: {
-            nombre_cliente: true,
-            apellidos_cliente: true,
-          },
-        },
-      },
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        { message: "Usuario no encontrado" },
-        { status: 400 }
-      );
-    }
-
     let prioridad = "" as Prioridad;
 
     if (tipo === Tipo.INCIDENCIA) {
@@ -64,33 +34,27 @@ async function createTicket(req: NextRequest, res: NextResponse) {
 
     const ticket = await prisma.ticket.create({
       data: {
+        email,
         tipo: tipo,
-        area: area,
+        area: TipoPregunta.CUENTA,
         estado: "ABIERTO",
         prioridad,
         motivo,
         descripcion,
         fecha_inicio: today(getLocalTimeZone()).toDate(getLocalTimeZone()),
-        id_user: user.id,
       },
     });
 
-    const name =
-      user.cliente?.nombre_cliente + " " + user.cliente?.apellidos_cliente ||
-      user.duenonegocio?.nombre_dueneg +
-        " " +
-        user.duenonegocio?.apellidos_dueneg;
-
     const emailHtml = render(
       NewTicketNotification({
-        email: user.email,
-        userName: name,
+        email: email,
+        userName: email,
         ticket: ticket as unknown as ITicket,
       })
     );
 
     const msg = {
-      to: user.email,
+      to: email,
       from: "Support<harvestreborn@gmail.com>",
       subject: "Nuevo ticket creado",
       html: emailHtml,
@@ -116,18 +80,4 @@ async function createTicket(req: NextRequest, res: NextResponse) {
   }
 }
 
-async function getTickets(req: NextRequest, res: NextResponse) {
-  try {
-    const tickets = await prisma.ticket.findMany();
-
-    return NextResponse.json(tickets);
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      { message: "Error al obtener los tickets" },
-      { status: 500 }
-    );
-  }
-}
-
-export { createTicket as POST, getTickets as GET };
+export { createGuestTicket as POST };

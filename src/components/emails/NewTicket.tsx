@@ -46,14 +46,16 @@ export const NewTicketNotification = ({ email, userName, ticket }: Props) => (
           <Text style={paragraph}>No. de ticket: {ticket.id_ticket}</Text>
           <Text style={paragraph}>Descripcion: {ticket.descripcion}</Text>
         </Section>
-        <Section style={btnContainer}>
-          <Button
-            href={`${baseUrl}/tickets/${ticket.id_ticket}`}
-            style={button}
-          >
-            Ver ticket
-          </Button>
-        </Section>
+        {userName.includes("@") ? null : (
+          <Section style={btnContainer}>
+            <Button
+              href={`${baseUrl}/tickets/${ticket.id_ticket}`}
+              style={button}
+            >
+              Ver ticket
+            </Button>
+          </Section>
+        )}
         <Text style={paragraph}>
           Si tiene alguna pregunta o necesita más información, no dude en
           responder a este correo electrónico.

@@ -15,11 +15,12 @@ datasource db {
 }
 
 model Ticket {
-  id_ticket String    @id @default(cuid())
+  id_ticket String       @id @default(cuid())
   tipo      Tipo
   area      TipoPregunta
   estado    Estado
   prioridad Prioridad
+  email     String?
 
   motivo       String
   descripcion  String    @db.Text
@@ -30,8 +31,8 @@ model Ticket {
 
   comentarios TicketComentario[]
 
-  id_user String
-  user    User   @relation(fields: [id_user], references: [id])
+  id_user String?
+  user    User?   @relation(fields: [id_user], references: [id])
 
   id_support String?
   support    UserSupport? @relation(fields: [id_support], references: [id_support])

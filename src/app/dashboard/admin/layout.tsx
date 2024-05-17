@@ -9,7 +9,9 @@ export default async function AdminSupportLayout({
   children: ReactNode;
 }) {
   const session = await getServerSession(authOptions);
-  if (session?.user.id_rol !== 1) redirect("/");
-
-  return <>{children}</>;
+  if (session?.user.id_rol === 1 || session?.user.id_rol === 6) {
+    return <>{children}</>;
+  } else {
+    return redirect("/");
+  }
 }

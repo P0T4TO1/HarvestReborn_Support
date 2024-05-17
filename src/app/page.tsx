@@ -11,7 +11,8 @@ export default async function Home() {
   const questions = await getQuestions();
 
   if (session?.user.id_rol === 5) redirect("/dashboard");
-  if (session?.user.id_rol === 1) redirect("/dashboard/admin");
+  if (session?.user.id_rol === 1 || session?.user.id_rol === 6)
+    redirect("/dashboard/admin");
   if (session?.user.id_rol === 2) {
     const dueneg = await prisma2.d_duenonegocio.findUnique({
       where: {

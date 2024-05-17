@@ -51,7 +51,7 @@ export const SidebarWrapper = () => {
                 title="Tickets"
                 icon={<FaTicket size={24} />}
                 href={
-                  session?.user.id_rol === 1
+                  session?.user.id_rol === 1 || session?.user.id_rol === 6
                     ? "/dashboard/admin/tickets"
                     : "/dashboard/tickets"
                 }
