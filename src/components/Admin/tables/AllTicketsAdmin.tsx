@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo, useCallback, Key, ChangeEvent } from "react";
+import { useState, useMemo, useCallback, Key } from "react";
+
 import {
   Table,
   TableHeader,
@@ -18,27 +19,39 @@ import {
   Selection,
   SortDescriptor,
   Tooltip,
+  Chip,
+  ChipProps,
+  Link,
 } from "@nextui-org/react";
-import { ITicket } from "@/interfaces";
+
+import {
+  MdOutlineAssignmentTurnedIn,
+  MdPriorityHigh,
+  MdLowPriority,
+} from "react-icons/md";
+import { CgChevronDoubleDownR } from "react-icons/cg";
+import { PiDotsThreeCircleDuotone } from "react-icons/pi";
 import { FaChevronDown, FaEdit, FaRegTrashAlt, FaSearch } from "react-icons/fa";
+
+import {
+  columnsTableTickets as columns,
+  statusColorMap,
+  statusOptions,
+  typeColorMap,
+  typeOptions,
+  priorityColorMap,
+  priorityOptions,
+} from "@/utils";
+import { ITicket } from "@/interfaces";
 
 interface Props {
   tickets: ITicket[];
 }
 
-const columns = [
-  { name: "ID", uid: "id_ticket", sortable: true },
-  { name: "TIPO", uid: "tipo", sortable: true },
-  { name: "ESTADO", uid: "estado", sortable: true },
-  { name: "PRIORIDAD", uid: "prioridad", sortable: true },
-  { name: "FECHA", uid: "fecha_inicio", sortable: true },
-  { name: "ACCIONES", uid: "acciones", sortable: false },
-];
-
 const INITIAL_VISIBLE_COLUMNS = [
   "id_ticket",
-  "tipo",
   "estado",
+  "tipo",
   "prioridad",
   "fecha_inicio",
   "acciones",
@@ -51,9 +64,11 @@ export const TableTickets = ({ tickets }: Props) => {
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
   const [statusFilter, setStatusFilter] = useState<Selection>("all");
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [typeFilter, setTypeFilter] = useState<Selection>("all");
+  const [priorityFilter, setPriorityFilter] = useState<Selection>("all");
+  const rowsPerPage = 10;
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-    column: "fecha_orden",
+    column: "fecha_inicio",
     direction: "ascending",
   });
 
@@ -70,16 +85,47 @@ export const TableTickets = ({ tickets }: Props) => {
   }, [visibleColumns]);
 
   const filteredItems = useMemo(() => {
-    let filteredOrders = [...tickets];
+    let filteredTickets = [...tickets];
 
     if (hasSearchFilter) {
-      filteredOrders = filteredOrders.filter((mergeOrder) =>
+      filteredTickets = filteredTickets.filter((mergeOrder) =>
         mergeOrder.id_ticket.toLowerCase().includes(filterValue.toLowerCase())
       );
     }
+    if (
+      statusFilter !== "all" &&
+      Array.from(statusFilter).length !== statusOptions.length
+    ) {
+      filteredTickets = filteredTickets.filter((ticket) =>
+        Array.from(statusFilter).includes(ticket.estado)
+      );
+    }
+    if (
+      typeFilter !== "all" &&
+      Array.from(typeFilter).length !== typeOptions.length
+    ) {
+      filteredTickets = filteredTickets.filter((ticket) =>
+        Array.from(typeFilter).includes(ticket.tipo)
+      );
+    }
+    if (
+      priorityFilter !== "all" &&
+      Array.from(priorityFilter).length !== priorityOptions.length
+    ) {
+      filteredTickets = filteredTickets.filter((ticket) =>
+        Array.from(priorityFilter).includes(ticket.prioridad)
+      );
+    }
 
-    return filteredOrders;
-  }, [tickets, filterValue, hasSearchFilter]);
+    return filteredTickets;
+  }, [
+    tickets,
+    filterValue,
+    hasSearchFilter,
+    statusFilter,
+    typeFilter,
+    priorityFilter,
+  ]);
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -113,26 +159,89 @@ export const TableTickets = ({ tickets }: Props) => {
 
     switch (columnKey) {
       case "id_ticket":
-        return <>{ticket.id_ticket}</>;
+        return (
+          <>
+            <Link
+              href={`/dashboard/admin/tickets/${ticket.id_ticket}`}
+              size="sm"
+              underline="always"
+              color="foreground"
+            >
+              {ticket.id_ticket}
+            </Link>
+          </>
+        );
       case "tipo":
-        return <>{ticket.tipo}</>;
+        return (
+          <Chip
+            size="sm"
+            variant="dot"
+            color={typeColorMap[ticket.tipo] as ChipProps["color"]}
+          >
+            {ticket.tipo}
+          </Chip>
+        );
       case "estado":
-        return <>{ticket.estado}</>;
+        return (
+          <Chip
+            size="sm"
+            variant="flat"
+            color={statusColorMap[ticket.estado] as ChipProps["color"]}
+          >
+            {ticket.estado}
+          </Chip>
+        );
       case "prioridad":
-        return <>{ticket.prioridad}</>;
+        return (
+          <Chip
+            size="sm"
+            variant="flat"
+            color={priorityColorMap[ticket.prioridad] as ChipProps["color"]}
+            startContent={
+              ticket.prioridad === "INMEDIATA" ? (
+                <MdPriorityHigh />
+              ) : ticket.prioridad === "BAJA" ? (
+                <MdLowPriority />
+              ) : ticket.prioridad === "MEDIA" ? (
+                <PiDotsThreeCircleDuotone />
+              ) : (
+                <CgChevronDoubleDownR />
+              )
+            }
+          >
+            {ticket.prioridad}
+          </Chip>
+        );
       case "fecha_inicio":
-        return <>{ticket.fecha_inicio}</>;
+        return (
+          <>
+            {new Date(ticket.fecha_inicio.toString()).toLocaleDateString(
+              "es-MX",
+              {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              }
+            )}
+          </>
+        );
       case "acciones":
         return (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
+            <Tooltip content="Asignar">
+              <Button variant="light" isIconOnly>
+                <MdOutlineAssignmentTurnedIn size={20} />
+              </Button>
+            </Tooltip>
             <Tooltip content="Editar">
-              <FaEdit className="text-blue-800 cursor-pointer" size={20} />
+              <Button variant="light" isIconOnly>
+                <FaEdit size={20} />
+              </Button>
             </Tooltip>
             <Tooltip content="Eliminar">
-              <FaRegTrashAlt
-                className="text-red-800 cursor-pointer"
-                size={20}
-              />
+              <Button variant="light" color="danger" isIconOnly>
+                <FaRegTrashAlt size={20} />
+              </Button>
             </Tooltip>
           </div>
         );
@@ -152,14 +261,6 @@ export const TableTickets = ({ tickets }: Props) => {
       setPage(page - 1);
     }
   }, [page]);
-
-  const onRowsPerPageChange = useCallback(
-    (e: ChangeEvent<HTMLSelectElement>) => {
-      setRowsPerPage(Number(e.target.value));
-      setPage(1);
-    },
-    []
-  );
 
   const onSearchChange = useCallback((value?: string) => {
     if (value) {
@@ -182,13 +283,76 @@ export const TableTickets = ({ tickets }: Props) => {
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
-            placeholder="Buscar por cliente..."
+            placeholder="Buscar por id ticket..."
             startContent={<FaSearch size={20} />}
             value={filterValue}
             onClear={() => onClear()}
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
+            <Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button endContent={<FaChevronDown size={20} />} variant="flat">
+                  Tipo
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Table Columns"
+                closeOnSelect={false}
+                selectedKeys={typeFilter}
+                selectionMode="multiple"
+                onSelectionChange={setTypeFilter}
+              >
+                {typeOptions.map((type) => (
+                  <DropdownItem key={type.uid} className="capitalize">
+                    {type.name}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+            <Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button endContent={<FaChevronDown size={20} />} variant="flat">
+                  Prioridad
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Table Columns"
+                closeOnSelect={false}
+                selectedKeys={priorityFilter}
+                selectionMode="multiple"
+                onSelectionChange={setPriorityFilter}
+              >
+                {priorityOptions.map((priority) => (
+                  <DropdownItem key={priority.uid} className="capitalize">
+                    {priority.name}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+            <Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button endContent={<FaChevronDown size={20} />} variant="flat">
+                  Estado
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Table Columns"
+                closeOnSelect={false}
+                selectedKeys={statusFilter}
+                selectionMode="multiple"
+                onSelectionChange={setStatusFilter}
+              >
+                {statusOptions.map((status) => (
+                  <DropdownItem key={status.uid} className="capitalize">
+                    {status.name.toUpperCase()}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button endContent={<FaChevronDown size={20} />} variant="flat">
@@ -214,20 +378,29 @@ export const TableTickets = ({ tickets }: Props) => {
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            Total de clientes: {tickets.length}
+            Total de tickets: {tickets.length}
           </span>
         </div>
       </div>
     );
-  }, [filterValue, visibleColumns, onSearchChange, tickets.length, onClear]);
+  }, [
+    filterValue,
+    visibleColumns,
+    onSearchChange,
+    tickets.length,
+    onClear,
+    statusFilter,
+    typeFilter,
+    priorityFilter,
+  ]);
 
   const bottomContent = useMemo(() => {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
         <span className="w-[30%] text-small text-default-400">
           {selectedKeys === "all"
-            ? "Todos los clientes seleccionados"
-            : `${selectedKeys.size} de ${filteredItems.length} clientes seleccionados`}
+            ? "Todos los tickets seleccionados"
+            : `${selectedKeys.size} de ${filteredItems.length} tickets seleccionados`}
         </span>
         <Pagination
           isCompact
@@ -274,8 +447,6 @@ export const TableTickets = ({ tickets }: Props) => {
         isHeaderSticky
         bottomContent={bottomContent}
         bottomContentPlacement="outside"
-        selectedKeys={selectedKeys}
-        selectionMode="multiple"
         sortDescriptor={sortDescriptor}
         topContent={topContent}
         topContentPlacement="outside"

@@ -1,10 +1,13 @@
-import { ContactForm, NavbarComponent, Footer } from "@/components";
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/authOptions";
 import { Button, Link } from "@nextui-org/react";
+import { ContactForm, NavbarComponent, Footer } from "@/components";
 
 export default async function Contact() {
   const session = await getServerSession(authOptions);
+  if (session?.user.id_rol === 4)
+    redirect(`${process.env.NEXT_PUBLIC_APP_URL}/auth/register?oauth=true`);
 
   if (!session) {
     return (

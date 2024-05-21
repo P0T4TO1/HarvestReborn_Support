@@ -6,6 +6,8 @@ import { FaExclamation } from "react-icons/fa";
 
 export default async function ContactGuest() {
   const session = await getServerSession(authOptions);
+  if (session?.user.id_rol === 4)
+    redirect(`${process.env.NEXT_PUBLIC_APP_URL}/auth/register?oauth=true`);
   if (session) redirect("/contact");
 
   return (

@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import axios, { AxiosError } from "axios";
 
-import { ITicket } from "@/interfaces";
+import { ITicket, IUser } from "@/interfaces";
 
 export const revalidate = 3600;
 
@@ -100,12 +100,47 @@ export const getTicketById = async (
   }
 };
 
+export const getTicketByIdForAdmin = async (
+  id_ticket: string
+): Promise<ITicket | undefined> => {
+  if (!id_ticket) {
+    return;
+  }
+
+  try {
+    const { data } = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/ticket/admin/${id_ticket}`
+    );
+
+    return data as unknown as ITicket;
+  } catch (error) {
+    console.error(error);
+    return;
+  }
+};
+
 export const getAllTickets = async (): Promise<ITicket[] | undefined> => {
   try {
     const { data } = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/ticket`
     );
     return data as unknown as ITicket[];
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error(error.response?.data);
+      return;
+    }
+    console.error(error);
+    return;
+  }
+};
+
+export const getUsersSupport = async (): Promise<IUser[] | undefined> => {
+  try {
+    const { data } = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/admin/users`
+    );
+    return data as unknown as IUser[];
   } catch (error) {
     if (error instanceof AxiosError) {
       console.error(error.response?.data);

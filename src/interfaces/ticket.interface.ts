@@ -7,6 +7,8 @@ export interface ITicket {
   estado: EstadoTicket;
   prioridad: Prioridad;
 
+  email?: string;
+
   motivo: string;
   descripcion: string;
   fecha_inicio: Date;
@@ -16,9 +18,10 @@ export interface ITicket {
 
   comentarios?: ITicketComentario[];
 
-  id_user: string;
-  id_user_soporte: string;
-  user_soporte: IUser;
+  id_user?: string;
+  user?: IUser;
+  id_user_soporte?: string;
+  user_soporte?: IUser;
 }
 
 export enum Tipo {

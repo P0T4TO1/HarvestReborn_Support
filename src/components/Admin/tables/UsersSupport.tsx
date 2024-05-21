@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback, Key } from "react";
+
 import {
   Table,
   TableHeader,
@@ -17,65 +18,33 @@ import {
   Pagination,
   Selection,
   SortDescriptor,
-  Tooltip,
-  Chip,
-  ChipProps,
+  Link,
 } from "@nextui-org/react";
-import { FaChevronDown, FaEdit, FaRegTrashAlt, FaSearch } from "react-icons/fa";
+import { toast } from "sonner";
+import { FaChevronDown, FaSearch } from "react-icons/fa";
+import { DANGER_TOAST, SUCCESS_TOAST } from "@/components/ui";
 
-import { IPreguntas } from "@/interfaces";
+import { IUser } from "@/interfaces";
+import { hrSupportApi } from "@/api";
+import { columnsTableUsers as columns } from "@/utils";
 
-const columns = [
-  { name: "ID", uid: "id_prefac", sortable: true },
-  { name: "Pregunta", uid: "pregunta", sortable: true },
-  { name: "Tipo", uid: "tipo", sortable: true },
-  { name: "Acciones", uid: "actions" },
-];
+const INITIAL_VISIBLE_COLUMNS = ["id", "nombre", "apellidos", "email"];
 
-const INITIAL_VISIBLE_COLUMNS = ["id_prefac", "pregunta", "tipo", "actions"];
-
-const tipoOptions = [
-  { name: "General", uid: "GENERAL" },
-  { name: "Cuenta", uid: "CUENTA" },
-  { name: "Negocio", uid: "NEGOCIO" },
-  { name: "Cliente", uid: "CLIENTE" },
-  { name: "Dueño de negocio", uid: "DUENONEGOCIO" },
-  { name: "Ordenes", uid: "ORDENES" },
-  { name: "Productos", uid: "PRODUCTOS" },
-  { name: "Inventario", uid: "INVENTARIO" },
-  { name: "Chat", uid: "CHAT" },
-  { name: "Publicaciones", uid: "PUBLICACIONES" },
-  { name: "Técnico", uid: "TECNICO" },
-];
-
-const tipoColorMap = {
-  GENERAL: "gray",
-  CUENTA: "blue",
-  NEGOCIO: "green",
-  CLIENTE: "orange",
-  DUENONEGOCIO: "purple",
-  ORDENES: "red",
-  PRODUCTOS: "cyan",
-  INVENTARIO: "pink",
-  CHAT: "yellow",
-  PUBLICACIONES: "teal",
-  TECNICO: "indigo",
-};
-
-interface TableFaqsProps {
-  questions: IPreguntas[];
+interface Props {
+  users: IUser[];
+  id_ticket: string;
 }
 
-export const TableFaq = ({ questions }: TableFaqsProps) => {
+export const UsersSupport = ({ users, id_ticket }: Props) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [filterValue, setFilterValue] = useState("");
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
   const [visibleColumns, setVisibleColumns] = useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
-  const [typeFilter, setTypeFilter] = useState<Selection>("all");
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const rowsPerPage = 10;
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-    column: "tipo",
+    column: "nombre",
     direction: "ascending",
   });
 
@@ -92,24 +61,16 @@ export const TableFaq = ({ questions }: TableFaqsProps) => {
   }, [visibleColumns]);
 
   const filteredItems = useMemo(() => {
-    let filteredQuestions = [...questions];
+    let filteredUsers = [...users];
 
     if (hasSearchFilter) {
-      filteredQuestions = filteredQuestions.filter((question) =>
-        question.pregunta.toLowerCase().includes(filterValue.toLowerCase())
-      );
-    }
-    if (
-      typeFilter !== "all" &&
-      Array.from(typeFilter).length !== tipoOptions.length
-    ) {
-      filteredQuestions = filteredQuestions.filter((question) =>
-        Array.from(typeFilter).includes(question.tipo)
+      filteredUsers = filteredUsers.filter((user) =>
+        user.id.toLowerCase().includes(filterValue.toLowerCase())
       );
     }
 
-    return filteredQuestions;
-  }, [questions, filterValue, hasSearchFilter, typeFilter]);
+    return filteredUsers;
+  }, [users, filterValue, hasSearchFilter]);
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -118,61 +79,67 @@ export const TableFaq = ({ questions }: TableFaqsProps) => {
     const end = start + rowsPerPage;
 
     return filteredItems.slice(start, end);
-  }, [filteredItems, page, rowsPerPage]);
+  }, [page, filteredItems, rowsPerPage]);
 
   const sortedItems = useMemo(() => {
     const { column, direction } = sortDescriptor;
 
     return items.sort((a, b) => {
-      if (
-        (a[column as keyof IPreguntas] ?? "") <
-        (b[column as keyof IPreguntas] ?? "")
-      ) {
+      if ((a[column as keyof IUser] ?? "") < (b[column as keyof IUser] ?? "")) {
         return direction === "ascending" ? -1 : 1;
       }
-      if (
-        (a[column as keyof IPreguntas] ?? "") >
-        (b[column as keyof IPreguntas] ?? "")
-      ) {
+      if ((a[column as keyof IUser] ?? "") > (b[column as keyof IUser] ?? "")) {
         return direction === "ascending" ? 1 : -1;
       }
       return 0;
     });
-  }, [items, sortDescriptor]);
+  }, [sortDescriptor, items]);
 
-  const renderCell = useCallback((question: IPreguntas, columnKey: Key) => {
-    const cellValue = question[columnKey as keyof IPreguntas];
+  const assignUser = (id_user: string, id_ticket: string) => {
+    setIsLoading(true);
+    try {
+      hrSupportApi
+        .put("/admin/tickets/assign", {
+          id_user_support: id_user,
+          id_ticket,
+        })
+        .then((response) => {
+          console.log(response);
+          toast("Usuario asignado correctamente", SUCCESS_TOAST);
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.log(error);
+          toast("Error al asignar el usuario", DANGER_TOAST);
+          setIsLoading(false);
+        });
+    } catch (error) {
+      console.error(error);
+      toast("Error al asignar el usuario", DANGER_TOAST);
+      setIsLoading(false);
+    }
+  };
+
+  const renderCell = useCallback((user: IUser, columnKey: Key) => {
+    const cellValue = user[columnKey as keyof IUser];
 
     switch (columnKey) {
-      case "id_prefac":
-        return cellValue;
-      case "pregunta":
-        return cellValue;
-      case "tipo":
+      case "id":
         return (
-          <Chip
-            size="sm"
-            color={tipoColorMap[question.tipo] as ChipProps["color"]}
-            variant="flat"
+          <Button
+            variant="light"
+            className="underline"
+            onPress={() => assignUser(user.id, id_ticket)}
           >
-            {question.tipo.charAt(0) + question.tipo.slice(1).toLowerCase()}
-          </Chip>
+            {user.id}
+          </Button>
         );
-      case "actions":
-        return (
-          <div className="flex gap-2">
-            <Tooltip content="Editar" placement="top">
-              <Button size="sm" variant="flat" onPress={() => {}}>
-                <FaEdit size={16} />
-              </Button>
-            </Tooltip>
-            <Tooltip content="Eliminar" placement="top">
-              <Button size="sm" variant="flat" onPress={() => {}}>
-                <FaRegTrashAlt size={16} />
-              </Button>
-            </Tooltip>
-          </div>
-        );
+      case "nombre":
+        return <>{user.nombre}</>;
+      case "apellidos":
+        return <>{user.apellidos}</>;
+      case "email":
+        return <>{user.email}</>;
       default:
         return cellValue;
     }
@@ -211,34 +178,13 @@ export const TableFaq = ({ questions }: TableFaqsProps) => {
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
-            placeholder="Buscar por pregunta..."
+            placeholder="Buscar por id..."
             startContent={<FaSearch size={20} />}
             value={filterValue}
             onClear={() => onClear()}
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
-            <Dropdown>
-              <DropdownTrigger className="hidden sm:flex">
-                <Button endContent={<FaChevronDown size={20} />} variant="flat">
-                  Tipo
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                disallowEmptySelection
-                aria-label="Table Columns"
-                closeOnSelect={false}
-                selectedKeys={typeFilter}
-                selectionMode="multiple"
-                onSelectionChange={setTypeFilter}
-              >
-                {tipoOptions.map((status) => (
-                  <DropdownItem key={status.uid} className="capitalize">
-                    {status.name}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown>
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button endContent={<FaChevronDown size={20} />} variant="flat">
@@ -264,20 +210,20 @@ export const TableFaq = ({ questions }: TableFaqsProps) => {
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            Total de clientes: {questions.length}
+            Total de usuarios: {users.length}
           </span>
         </div>
       </div>
     );
-  }, [filterValue, visibleColumns, onSearchChange, questions.length, onClear, typeFilter]);
+  }, [filterValue, visibleColumns, onSearchChange, users.length, onClear]);
 
   const bottomContent = useMemo(() => {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
         <span className="w-[30%] text-small text-default-400">
           {selectedKeys === "all"
-            ? "Todos los clientes seleccionados"
-            : `${selectedKeys.size} de ${filteredItems.length} clientes seleccionados`}
+            ? "Todos los usuarios seleccionados"
+            : `${selectedKeys.size} de ${filteredItems.length} usuarios seleccionados`}
         </span>
         <Pagination
           isCompact
@@ -319,13 +265,16 @@ export const TableFaq = ({ questions }: TableFaqsProps) => {
 
   return (
     <div className=" w-full flex flex-col gap-4">
+      {isLoading && (
+        <div className="w-full flex justify-center items-center">
+          <div className="w-10 h-10 border-2 border-t-2 border-gray-200 rounded-full animate-spin"></div>
+        </div>
+      )}
       <Table
         aria-label="Example table with custom cells, pagination and sorting"
         isHeaderSticky
         bottomContent={bottomContent}
         bottomContentPlacement="outside"
-        selectedKeys={selectedKeys}
-        selectionMode="multiple"
         sortDescriptor={sortDescriptor}
         topContent={topContent}
         topContentPlacement="outside"
@@ -343,9 +292,9 @@ export const TableFaq = ({ questions }: TableFaqsProps) => {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody emptyContent={"No hay preguntas 😭"} items={sortedItems}>
+        <TableBody emptyContent={"No hay usuarios 😭"} items={sortedItems}>
           {(item) => (
-            <TableRow key={item.id_prefec}>
+            <TableRow key={item.id}>
               {(columnKey) => (
                 <TableCell>{renderCell(item, columnKey) as any}</TableCell>
               )}

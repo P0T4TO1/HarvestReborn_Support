@@ -9,6 +9,8 @@ export default async function MainLayout({
 }: Readonly<{ children: ReactNode }>) {
   const session = await getServerSession(authOptions);
   if (!session) redirect(`${process.env.NEXT_PUBLIC_APP_URL}/auth/login`);
+  if (session.user.id_rol === 4)
+    redirect(`${process.env.NEXT_PUBLIC_APP_URL}/auth/register?oauth=true`);
   if (session.user.id_rol === 5) redirect("/dashboard");
   if (session.user.id_rol === 1) redirect("/dashboard/admin");
 

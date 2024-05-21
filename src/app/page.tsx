@@ -11,6 +11,8 @@ export default async function Home() {
   const questions = await getQuestions();
 
   if (session?.user.id_rol === 5) redirect("/dashboard");
+  if (session?.user.id_rol === 4)
+    redirect(`${process.env.NEXT_PUBLIC_APP_URL}/auth/register?oauth=true`);
   if (session?.user.id_rol === 1 || session?.user.id_rol === 6)
     redirect("/dashboard/admin");
   if (session?.user.id_rol === 2) {
