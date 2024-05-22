@@ -150,3 +150,26 @@ export const getUsersSupport = async (): Promise<IUser[] | undefined> => {
     return;
   }
 };
+
+export const getTicketsByUserSupport = async (
+  id_user: string
+): Promise<ITicket[] | undefined> => {
+  if (!id_user) {
+    return;
+  }
+
+  try {
+    const { data } = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/admin/tickets/${id_user}`
+    );
+
+    return data as unknown as ITicket[];
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error(error.response?.data);
+      return;
+    }
+    console.error(error);
+    return;
+  }
+};

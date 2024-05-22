@@ -24,14 +24,10 @@ import {
   Link,
 } from "@nextui-org/react";
 
-import {
-  MdOutlineAssignmentTurnedIn,
-  MdPriorityHigh,
-  MdLowPriority,
-} from "react-icons/md";
+import { MdPriorityHigh, MdLowPriority } from "react-icons/md";
 import { CgChevronDoubleDownR } from "react-icons/cg";
 import { PiDotsThreeCircleDuotone } from "react-icons/pi";
-import { FaChevronDown, FaEdit, FaRegTrashAlt, FaSearch } from "react-icons/fa";
+import { FaChevronDown, FaRegTrashAlt, FaSearch } from "react-icons/fa";
 
 import {
   columnsTableTickets as columns,
@@ -46,6 +42,7 @@ import { ITicket } from "@/interfaces";
 
 interface Props {
   tickets: ITicket[];
+  id_role?: number;
 }
 
 const INITIAL_VISIBLE_COLUMNS = [
@@ -57,7 +54,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "acciones",
 ];
 
-export const TableTickets = ({ tickets }: Props) => {
+export const TableTickets = ({ tickets, id_role }: Props) => {
   const [filterValue, setFilterValue] = useState("");
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
   const [visibleColumns, setVisibleColumns] = useState<Selection>(
@@ -161,14 +158,25 @@ export const TableTickets = ({ tickets }: Props) => {
       case "id_ticket":
         return (
           <>
-            <Link
-              href={`/dashboard/admin/tickets/${ticket.id_ticket}`}
-              size="sm"
-              underline="always"
-              color="foreground"
-            >
-              {ticket.id_ticket}
-            </Link>
+            {id_role === 1 || id_role === 6 ? (
+              <Link
+                href={`/dashboard/admin/tickets/${ticket.id_ticket}`}
+                size="sm"
+                underline="always"
+                color="foreground"
+              >
+                {ticket.id_ticket}
+              </Link>
+            ) : (
+              <Link
+                href={`/dashboard/tickets/${ticket.id_ticket}`}
+                size="sm"
+                underline="always"
+                color="foreground"
+              >
+                {ticket.id_ticket}
+              </Link>
+            )}
           </>
         );
       case "tipo":
@@ -228,16 +236,6 @@ export const TableTickets = ({ tickets }: Props) => {
       case "acciones":
         return (
           <div className="flex items-center gap-4">
-            <Tooltip content="Asignar">
-              <Button variant="light" isIconOnly>
-                <MdOutlineAssignmentTurnedIn size={20} />
-              </Button>
-            </Tooltip>
-            <Tooltip content="Editar">
-              <Button variant="light" isIconOnly>
-                <FaEdit size={20} />
-              </Button>
-            </Tooltip>
             <Tooltip content="Eliminar">
               <Button variant="light" color="danger" isIconOnly>
                 <FaRegTrashAlt size={20} />

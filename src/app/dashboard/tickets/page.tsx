@@ -1,11 +1,14 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
-import { getAllTickets } from "@/actions/tickets";
+import { notFound } from "next/navigation";
+import { getTicketsByUserSupport } from "@/actions/tickets";
 import { TableTickets } from "@/components";
 
 export default async function TicketsPage() {
   const session = await getServerSession(authOptions);
-  const tickets = await getAllTickets();
+  if (!session?.user) return notFound();
+
+  const tickets = await getTicketsByUserSupport(session?.user.id);
 
   if (!tickets) {
     return (
@@ -20,7 +23,9 @@ export default async function TicketsPage() {
 
   return (
     <div className="container mx-auto">
-      <h3 className="text-xl font-semibold mt-8">Todos los tickets</h3>
+      <h3 className="text-xl font-semibold mt-8">
+        Todos los tickets asignados
+      </h3>
       <TableTickets tickets={tickets} id_role={session?.user.id_rol} />
     </div>
   );

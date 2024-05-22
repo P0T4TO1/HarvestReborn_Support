@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import prisma from "@/lib/prisma";
 import prisma2 from "@/lib/prisma-second";
 import { today, getLocalTimeZone } from "@internationalized/date";
 import { Prioridad, Tipo, TipoPregunta, ITicket } from "@/interfaces";
 
-import { NewTicketNotification } from "@/components";
 import sgMail from "@sendgrid/mail";
 import { render } from "@react-email/render";
+import { NewTicketNotification } from "@/components";
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY || "");
 
@@ -94,6 +95,7 @@ async function createTicket(req: NextRequest, res: NextResponse) {
       from: "Support<harvestreborn@gmail.com>",
       subject: "Nuevo ticket creado",
       html: emailHtml,
+      msg_id: ticket.id_ticket,
     };
 
     try {
