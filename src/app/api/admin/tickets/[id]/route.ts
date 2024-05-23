@@ -15,7 +15,6 @@ async function getTicketsByUserSupport(
       },
       include: {
         comentarios: true,
-        user: true,
       },
     });
 
