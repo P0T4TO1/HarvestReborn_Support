@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
 
     const msg = {
       to: "harvestreborn@gmail.com",
-      from: senderEmail.toString(),
+      from: "harvestreborn@gmail.com",
       subject: "Nueva respuesta",
       text: text?.toString(),
       html: html.toString(),
