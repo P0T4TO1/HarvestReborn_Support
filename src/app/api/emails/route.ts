@@ -10,6 +10,8 @@ export async function POST(request: NextRequest) {
   try {
     const html = data.get("html");
     const from = data.get("from");
+    const text = data.get("Text");
+    const email = data.get("Email");
 
     const parsed = new parser({ keys: ["Email", "html", "Text"] }, { body: data })
     console.log(parsed, "parsed");
@@ -22,8 +24,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    console.log(user, "user");
-    console.log(senderEmail, "senderEmail");
+    console.log(text, "text");
+    console.log(email, "email");
     console.log(html, "html");
 
     return NextResponse.json({ success: true }, { status: 200 });
