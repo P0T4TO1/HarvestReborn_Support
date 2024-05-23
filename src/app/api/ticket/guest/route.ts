@@ -55,7 +55,7 @@ async function createGuestTicket(req: NextRequest) {
 
     const msg = {
       to: email,
-      from: "Support<harvestreborn@gmail.com>",
+      from: "Support<hr@support.harvest-reborn.me>",
       subject: "Nuevo ticket creado",
       html: emailHtml,
     };
@@ -63,7 +63,7 @@ async function createGuestTicket(req: NextRequest) {
     try {
       await sgMail.send(msg);
     } catch (error) {
-      console.error(error);
+      console.error(error, "error al enviar el correo");
       return NextResponse.json(
         { message: "Error al enviar el correo" },
         { status: 500 }

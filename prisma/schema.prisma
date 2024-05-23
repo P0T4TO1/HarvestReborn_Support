@@ -22,6 +22,8 @@ model Ticket {
   prioridad Prioridad
   email     String?
 
+  images String[]
+
   motivo       String
   descripcion  String    @db.Text
   fecha_inicio DateTime
@@ -45,6 +47,9 @@ model TicketRespuestas {
 
   respuesta String   @db.Text
   fecha     DateTime
+
+  id_user    String?
+  email_user String?
 
   @@index([id_ticket])
 }

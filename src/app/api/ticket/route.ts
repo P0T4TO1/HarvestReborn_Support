@@ -92,7 +92,7 @@ async function createTicket(req: NextRequest, res: NextResponse) {
 
     const msg = {
       to: user.email,
-      from: "Support<harvestreborn@gmail.com>",
+      from: "Support<hr@support.harvest-reborn.me>",
       subject: "Nuevo ticket creado",
       html: emailHtml,
       msg_id: ticket.id_ticket,
