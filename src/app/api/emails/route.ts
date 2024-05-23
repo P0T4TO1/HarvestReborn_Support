@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import prisma2 from "@/lib/prisma-second";
 import parser from "@sendgrid/inbound-mail-parser";
+import mail from "@sendgrid/mail";
 
 export async function POST(request: NextRequest) {
   const data = await request.formData();
@@ -10,11 +11,9 @@ export async function POST(request: NextRequest) {
     const html = data.get("html");
     const from = data.get("from");
 
-    const body = html
-      ?.toString()
-      .split(`<div dir="ltr">`)[1]
-      .split("</div>")[0];
-    const parsed = new parser({ keys: ["html"] }, { body: data });
+    const parsed = new parser({ keys: ["html"] }, { body: data }).getRawEmail(
+      (mail) => console.log(mail)
+    );
     console.log(parsed, "parsed");
 
     const senderEmail = from?.toString().split("<")[1].split(">")[0];
@@ -26,7 +25,6 @@ export async function POST(request: NextRequest) {
     });
 
     console.log(user, "user");
-    console.log(body, "body");
     console.log(senderEmail, "senderEmail");
     console.log(html, "html");
 
