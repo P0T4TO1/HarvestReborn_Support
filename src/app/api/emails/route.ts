@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import prisma2 from "@/lib/prisma-second";
-import parser from "@sendgrid/inbound-mail-parser";
-import mail from "@sendgrid/mail";
+import sgMail from "@sendgrid/mail";
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY || "");
 
 export async function POST(request: NextRequest) {
   const data = await request.formData();
@@ -10,13 +10,24 @@ export async function POST(request: NextRequest) {
   try {
     const html = data.get("html");
     const from = data.get("from");
-    const text = data.get("Text");
-    const email = data.get("Email");
-
-    const parsed = new parser({ keys: ["Email", "html", "Text"] }, { body: data })
-    console.log(parsed, "parsed");
+    const text = data.get("text");
+    const email = data.get("email");
 
     const senderEmail = from?.toString().split("<")[1].split(">")[0];
+
+    if (!html) {
+      return NextResponse.json(
+        { message: "Falta el campo html" },
+        { status: 400 }
+      );
+    }
+
+    if (!senderEmail) {
+      return NextResponse.json(
+        { message: "Email no encontrado en el campo from" },
+        { status: 400 }
+      );
+    }
 
     const user = await prisma2.m_user.findUnique({
       where: {
@@ -24,9 +35,22 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    console.log(text, "text");
+    const msg = {
+      to: "harvestreborn@gmail.com",
+      from: senderEmail.toString(),
+      subject: "Nueva respuesta",
+      text: text?.toString(),
+      html: html.toString(),
+    };
+
     console.log(email, "email");
-    console.log(html, "html");
+
+    try {
+      await sgMail.send(msg);
+    } catch (error) {
+      console.error(error, "Error sending email");
+      throw new Error("Error sending email");
+    }
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
