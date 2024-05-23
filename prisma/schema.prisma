@@ -30,15 +30,23 @@ model Ticket {
   respuesta String? @db.Text
 
   comentarios TicketComentario[]
+  respuestas  TicketRespuestas[]
 
   id_user String?
-  user    User?   @relation(fields: [id_user], references: [id])
 
   id_support String?
-  support    UserSupport? @relation(fields: [id_support], references: [id_support])
+}
 
-  @@index([id_user])
-  @@index([id_support])
+model TicketRespuestas {
+  id_respuesta Int @id @default(autoincrement())
+
+  id_ticket String
+  ticket    Ticket @relation(fields: [id_ticket], references: [id_ticket])
+
+  respuesta String   @db.Text
+  fecha     DateTime
+
+  @@index([id_ticket])
 }
 
 model TicketComentario {
@@ -71,26 +79,6 @@ enum Prioridad {
   MEDIA
   ALTA
   INMEDIATA
-}
-
-model User {
-  id        String @id @default(uuid())
-  nombre    String
-  apellidos String
-  email     String
-
-  tickets Ticket[]
-}
-
-model UserSupport {
-  id_support String @id @default(uuid())
-  nombre     String
-  apellidos  String
-  email      String
-
-  id_user String? @unique
-
-  tickets Ticket[]
 }
 
 model RespuestasFaq {

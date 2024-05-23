@@ -1,39 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
-import client from "@sendgrid/client";
-
-client.setApiKey(process.env.SENDGRID_API_KEY || "");
-
-const data = {
-  url: "http://localhost:4000/api/emails",
-  hostname: "harvest-reborn.me",
-  spam_check: false,
-  send_raw: false,
-};
-
-const request = {
-  url: `/v3/user/webhooks/parse/settings`,
-  method: "POST" as "POST",
-  body: data,
-};
 
 export async function POST(request: NextRequest) {
   const data = await request.formData();
 
-  console.log(data, "data");
+  try {
+    const body = data.get("html");
+    const from = data.get("from");
+    const subject = data.get("subject");
 
-  return NextResponse.json({ success: true }, { status: 200 });
-}
+    console.log(from, "from");
+    console.log(subject, "subject");
+    console.log(body, "body html");
 
-export async function GET(req: NextRequest) {
-  client
-    .request(request)
-    .then(([response, body]) => {
-      console.log(response.statusCode, "response.statusCode");
-      console.log(response.body, "response.body");
-    })
-    .catch((error) => {
-      console.log(error, "error");
-      return NextResponse.json({ success: false }, { status: 500 });
-    });
-  return NextResponse.json({ success: true }, { status: 200 });
+    return NextResponse.json({ success: true }, { status: 200 });
+  } catch (error) {
+    console.log(error, "error");
+    return NextResponse.json({ success: false }, { status: 500 });
+  }
 }
