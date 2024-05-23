@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     const html = data.get("html");
     const from = data.get("from");
 
-    const parsed = new parser({ keys: ["html"] }, { body: data }).getRawEmail(
+    const parsed = new parser({ keys: ["Email", "html", "Text"] }, { body: data }).getRawEmail(
       (mail) => console.log(mail)
     );
     console.log(parsed, "parsed");
