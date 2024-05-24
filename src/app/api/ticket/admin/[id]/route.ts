@@ -23,6 +23,7 @@ async function getTicketById(
       },
       include: {
         comentarios: true,
+        respuestas: true,
       },
     });
 

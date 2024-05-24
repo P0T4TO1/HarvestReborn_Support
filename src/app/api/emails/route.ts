@@ -10,8 +10,6 @@ export async function POST(request: NextRequest) {
   try {
     const html = data.get("html");
     const from = data.get("from");
-    const text = data.get("text");
-    const email = data.get("email");
 
     const senderEmail = from?.toString().split("<")[1].split(">")[0];
 
@@ -27,29 +25,6 @@ export async function POST(request: NextRequest) {
         { message: "Email no encontrado en el campo from" },
         { status: 400 }
       );
-    }
-
-    const user = await prisma2.m_user.findUnique({
-      where: {
-        email: senderEmail,
-      },
-    });
-
-    const msg = {
-      to: "harvestreborn@gmail.com",
-      from: "harvestreborn@gmail.com",
-      subject: "Nueva respuesta",
-      text: text?.toString(),
-      html: html.toString(),
-    };
-
-    console.log(email, "email");
-
-    try {
-      await sgMail.send(msg);
-    } catch (error) {
-      console.error(error, "Error sending email");
-      throw new Error("Error sending email");
     }
 
     return NextResponse.json({ success: true }, { status: 200 });

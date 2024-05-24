@@ -10,9 +10,14 @@ import {
   Tab,
   Tabs,
   useDisclosure,
+  Card,
+  CardBody,
+  CardHeader,
 } from "@nextui-org/react";
+import { TicketAnswer } from "../ui";
 import { FaSearch } from "react-icons/fa";
 import { TableModal } from "./TableModal";
+
 import { parseDate, getLocalTimeZone, now } from "@internationalized/date";
 
 import {
@@ -31,6 +36,7 @@ interface Props {
 
 export const TicketSettings = ({ ticket, users }: Props) => {
   const { onClose, isOpen, onOpen } = useDisclosure();
+  console.log(ticket);
 
   return (
     <>
@@ -39,7 +45,20 @@ export const TicketSettings = ({ ticket, users }: Props) => {
         id_ticket={ticket.id_ticket}
         users={users}
       />
-      <h1>TicketSettings</h1>
+      <div className="container mx-auto mt-8 flex justify-between items-center">
+        <h1>Ticket: {ticket.id_ticket}</h1>
+        <div className="flex gap-4">
+          <Button size="md" variant="bordered" radius="sm">
+            Actualizar
+          </Button>
+          <Button size="md" variant="bordered" radius="sm">
+            Resuelto
+          </Button>
+          <Button size="md" variant="bordered" radius="sm">
+            Eliminar
+          </Button>
+        </div>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 container mx-auto mt-6">
         <div className="flex flex-col gap-4">
           <div className="flex gap-6">
@@ -231,14 +250,47 @@ export const TicketSettings = ({ ticket, users }: Props) => {
       <div className="container mx-auto mt-8">
         <Tabs color="primary">
           <Tab title="Historial">
-            <div>
-              <h2>Historial</h2>
-            </div>
+            <Card>
+              <CardHeader>Historial</CardHeader>
+              <CardBody>
+                <>
+                  <TicketAnswer ticket={ticket} />
+                  {!ticket.respuestas ? (
+                    <div>
+                      <h2>No hay respuestas</h2>
+                    </div>
+                  ) : (
+                    <div>
+                      {ticket.respuestas.map((respuesta) => (
+                        <div
+                          key={respuesta.id_respuesta}
+                          className="flex gap-4"
+                        >
+                          <div>
+                            <h3>Respuesta</h3>
+                            <p>{respuesta.respuesta}</p>
+                          </div>
+                          <div>
+                            <h3>Fecha</h3>
+                            <p>{respuesta.fecha.toString()}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              </CardBody>
+            </Card>
           </Tab>
           <Tab title="Comentarios">
-            <div>
-              <h2>Comentarios</h2>
-            </div>
+            <Card>
+              <CardHeader>Comentarios</CardHeader>
+              <CardBody>
+                <div>
+                  <h2>Comentarios</h2>
+                </div>
+              </CardBody>
+            </Card>
           </Tab>
           <Tab title="Archivos">
             <div>

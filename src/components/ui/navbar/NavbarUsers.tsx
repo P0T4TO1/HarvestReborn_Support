@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 import {
   Navbar,
@@ -19,6 +19,7 @@ export const NavbarComponent = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { data: session } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
 
   return (
     <>
@@ -71,7 +72,11 @@ export const NavbarComponent = () => {
             </NavbarItem>
             <NavbarItem>
               <Link
-                href={`${process.env.NEXT_PUBLIC_APP_URL}/auth/login`}
+                href={`${
+                  process.env.NEXT_PUBLIC_APP_URL
+                }/auth/login?callbackUrl=${encodeURIComponent(
+                  process.env.NEXT_PUBLIC_SUPPORT_APP_URL + pathname
+                )}`}
                 color="foreground"
               >
                 Iniciar sesión

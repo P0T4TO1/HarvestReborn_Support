@@ -68,7 +68,6 @@ export const ContactForm = () => {
         })
         .then(() => {
           toast("Ticket creado", SUCCESS_TOAST);
-          setLoading(false);
           router.push("/my-tickets");
         })
         .catch((error) => {

@@ -1,11 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { today, getLocalTimeZone } from "@internationalized/date";
+import { now, getLocalTimeZone } from "@internationalized/date";
 import { Prioridad, Tipo, TipoPregunta, ITicket } from "@/interfaces";
 
 import { NewTicketNotification } from "@/components";
 import sgMail from "@sendgrid/mail";
 import { render } from "@react-email/render";
+
+import mailgun from "mailgun-js";
+
+const mg = mailgun({
+  apiKey: process.env.MAILGUN_API_KEY || "",
+  domain: process.env.MAILGUN_DOMAIN || "",
+});
+
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY || "");
 
@@ -41,7 +49,7 @@ async function createGuestTicket(req: NextRequest) {
         prioridad,
         motivo,
         descripcion,
-        fecha_inicio: today(getLocalTimeZone()).toDate(getLocalTimeZone()),
+        fecha_inicio: now(getLocalTimeZone()).toDate(),
       },
     });
 
@@ -55,13 +63,14 @@ async function createGuestTicket(req: NextRequest) {
 
     const msg = {
       to: email,
-      from: "Support<hr@support.harvest-reborn.me>",
+      from: "Support<support@harvestreborn.me>",
       subject: "Nuevo ticket creado",
       html: emailHtml,
     };
 
     try {
-      await sgMail.send(msg);
+      await mg.messages().send(msg);
+      // await sgMail.send(msg);
     } catch (error) {
       console.error(error, "error al enviar el correo");
       return NextResponse.json(

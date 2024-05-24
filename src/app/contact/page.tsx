@@ -1,11 +1,14 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { authOptions } from "@/lib/authOptions";
 import { Button, Link } from "@nextui-org/react";
 import { ContactForm, NavbarComponent, Footer } from "@/components";
 
 export default async function Contact() {
   const session = await getServerSession(authOptions);
+  const heads = headers();
+  const pathname = heads.get("next-url");
   if (session?.user.id_rol === 4)
     redirect(`${process.env.NEXT_PUBLIC_APP_URL}/auth/register?oauth=true`);
 
@@ -25,7 +28,13 @@ export default async function Contact() {
             <div className="flex justify-center mt-8">
               <Button
                 as={Link}
-                href={`${process.env.NEXT_PUBLIC_APP_URL}/auth/login`}
+                href={`${process.env.NEXT_PUBLIC_APP_URL}/auth/login${
+                  pathname
+                    ? `?callbackUrl=${encodeURIComponent(
+                        process.env.NEXT_PUBLIC_SUPPORT_APP_URL + pathname
+                      )}`
+                    : ""
+                }`}
                 color="primary"
                 className="w-full"
                 size="lg"

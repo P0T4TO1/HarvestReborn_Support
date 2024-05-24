@@ -17,6 +17,7 @@ export interface ITicket {
   respuesta?: string;
 
   comentarios?: ITicketComentario[];
+  respuestas?: ITicketRespuesta[];
 
   id_user?: string;
   user?: IUser;
@@ -52,4 +53,17 @@ export interface ITicketComentario {
 
   comentario: string;
   fecha: Date;
+}
+
+export interface ITicketRespuesta {
+  id_respuesta: string;
+
+  id_ticket: string;
+  ticket: ITicket;
+
+  respuesta: string;
+  fecha: Date;
+
+  id_user: string;
+  user: IUser;
 }

@@ -1,7 +1,8 @@
 import prisma from "@/lib/prisma";
 import axios, { AxiosError } from "axios";
 
-import { ITicket, IUser } from "@/interfaces";
+import { ITicket, IUser, ITicketRespuesta } from "@/interfaces";
+import { error } from "console";
 
 export const revalidate = 3600;
 
@@ -164,6 +165,35 @@ export const getTicketsByUserSupport = async (
     );
 
     return data as unknown as ITicket[];
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error(error.response?.data);
+      return;
+    }
+    console.error(error);
+    return;
+  }
+};
+
+export const postAnswer = async (
+  id_ticket: string,
+  respuesta: string,
+  id_user: string
+) => {
+  try {
+    const { data, status } = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/ticket/answer/${id_ticket}`,
+      {
+        respuesta,
+        id_user,
+      }
+    );
+
+    if (status !== 200) {
+      return "Error al crear respuesta";
+    }
+
+    return data as unknown as ITicketRespuesta;
   } catch (error) {
     if (error instanceof AxiosError) {
       console.error(error.response?.data);
