@@ -46,6 +46,7 @@ export const TicketAnswer = ({ ticket }: Props) => {
     }
     toast("Respuesta creada", SUCCESS_TOAST);
     setIsLoading(false);
+    window.location.reload();
   };
 
   return (

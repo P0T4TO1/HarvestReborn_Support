@@ -30,33 +30,33 @@ export async function POST(request: NextRequest) {
     },
   });
 
-    if (!user) {
-      const answer = await prisma.ticketRespuestas.create({
-        data: {
-          respuesta:
-            body.toString().split("________________________________")[0] ?? "",
-          id_ticket:
-            body.toString().split("No. de ticket: ")[1].split(" ")[0] ?? "",
-          fecha: now(getLocalTimeZone()).toDate(),
-          email_user: sender,
-        },
-      });
-      return NextResponse.json(
-        { ...answer, message: "Respuesta de usuario no registrado" },
-        { status: 200 }
-      );
-    }
-
+  if (!user) {
     const answer = await prisma.ticketRespuestas.create({
       data: {
         respuesta:
           body.toString().split("________________________________")[0] ?? "",
         id_ticket:
-          body.toString().split("No. de ticket: ")[1].split(" ")[0] ?? "",
+          body.toString().split("No. de ticket: ")[1].split("Si")[0] ?? "",
         fecha: now(getLocalTimeZone()).toDate(),
-        id_user: user.id ?? "",
+        email_user: sender,
       },
     });
+    return NextResponse.json(
+      { ...answer, message: "Respuesta de usuario no registrado" },
+      { status: 200 }
+    );
+  }
+
+  const answer = await prisma.ticketRespuestas.create({
+    data: {
+      respuesta:
+        body.toString().split("________________________________")[0] ?? "",
+      id_ticket:
+        body.toString().split("No. de ticket: ")[1].split(" ")[0] ?? "",
+      fecha: now(getLocalTimeZone()).toDate(),
+      id_user: user.id ?? "",
+    },
+  });
 
   return NextResponse.json(answer, { status: 200 });
 }
