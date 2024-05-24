@@ -53,7 +53,8 @@ export const TicketAnswer = ({ ticket }: Props) => {
       <div className="container mx-auto">
         <Textarea
           aria-label="respuesta"
-          label="Respuesta"
+          label="Tu mensaje"
+          labelPlacement="outside"
           rows={5}
           {...register("answer")}
         />

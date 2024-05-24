@@ -1,4 +1,4 @@
-import { ITicket } from "@/interfaces";
+import { ITicket, ICliente, IDuenoNegocio } from "@/interfaces";
 
 export interface IUser {
   id: string;
@@ -15,6 +15,9 @@ export interface IUser {
 
   nombre?: string;
   apellidos?: string;
+
+  cliente?: ICliente;
+  duenonegocio?: IDuenoNegocio;
 }
 
 export enum Estado {
@@ -33,7 +36,7 @@ export interface IRol {
 export interface ISoporte {
   id_soporte: string;
   id_user: string;
-  
+
   user: IUser;
   tickets: ITicket[];
 }

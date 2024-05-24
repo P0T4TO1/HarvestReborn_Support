@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import prisma2 from "@/lib/prisma-second";
+import {
+  Tipo,
+  TipoPregunta as Area,
+  Prioridad,
+  EstadoTicket,
+} from "@/interfaces";
 
 async function getTicketById(
   request: Request,
@@ -75,6 +81,10 @@ async function getTicketById(
               "",
             email: user.email,
           },
+          respuestas: ticket?.respuestas.map((respuesta) => ({
+            ...respuesta,
+            user,
+          })),
         },
         { status: 200 }
       );
@@ -100,6 +110,10 @@ async function getTicketById(
               "",
             email: user_support.email,
           },
+          respuestas: ticket?.respuestas.map((respuesta) => ({
+            ...respuesta,
+            user,
+          })),
         },
         { status: 200 }
       );
@@ -115,4 +129,89 @@ async function getTicketById(
   }
 }
 
-export { getTicketById as GET };
+async function deleteTicket(
+  request: Request,
+  { params }: { params: { id: string } },
+  req: NextRequest,
+  res: NextResponse
+) {
+  const { id } = params;
+  if (!id) {
+    return NextResponse.json(
+      { error: "Ticket no encontrado" },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const ticket = await prisma.ticket.delete({
+      where: {
+        id_ticket: id,
+      },
+    });
+
+    return NextResponse.json(ticket, { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { error: "Error al eliminar el ticket" },
+      { status: 500 }
+    );
+  }
+}
+
+interface Data {
+  tipo: string;
+  prioridad: string;
+  area: string;
+  estado: string;
+  fecha_inicio: Date;
+  fecha_cierre?: Date;
+  motivo: string;
+  descripcion: string;
+}
+
+async function putTicket(
+  request: Request,
+  { params }: { params: { id: string } },
+  req: NextRequest,
+  res: NextResponse
+) {
+  const { id } = params;
+  if (!id) {
+    return NextResponse.json(
+      { error: "Ticket no encontrado" },
+      { status: 400 }
+    );
+  }
+
+  const body = (await request.json()) as Data;
+
+  try {
+    const ticket = await prisma.ticket.update({
+      where: {
+        id_ticket: id,
+      },
+      data: {
+        tipo: body.tipo as Tipo,
+        prioridad: body.prioridad as Prioridad,
+        area: body.area as Area,
+        estado: body.estado as EstadoTicket,
+        fecha_inicio: body.fecha_inicio,
+        fecha_cierre: body.fecha_cierre,
+        motivo: body.motivo,
+        descripcion: body.descripcion,
+      },
+    });
+
+    return NextResponse.json(ticket, { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { error: "Error al actualizar el ticket" },
+      { status: 500 }
+    );
+  }
+}
+
+export { getTicketById as GET, deleteTicket as DELETE, putTicket as PUT };

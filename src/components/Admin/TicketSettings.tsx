@@ -2,32 +2,20 @@
 
 import {
   Button,
-  Input,
-  Select,
-  SelectItem,
-  Textarea,
-  DatePicker,
   Tab,
   Tabs,
   useDisclosure,
   Card,
   CardBody,
   CardHeader,
+  Divider,
+  Input,
 } from "@nextui-org/react";
-import { TicketAnswer } from "../ui";
-import { FaSearch } from "react-icons/fa";
 import { TableModal } from "./TableModal";
+import { FaSearch } from "react-icons/fa";
+import { TicketAnswer, TicketAnswers, SettingsTicketForm } from "@/components";
 
-import { parseDate, getLocalTimeZone, now } from "@internationalized/date";
-
-import {
-  ITicket,
-  Tipo,
-  TipoPregunta,
-  EstadoTicket,
-  Prioridad,
-  IUser,
-} from "@/interfaces";
+import { ITicket, IUser } from "@/interfaces";
 
 interface Props {
   ticket: ITicket;
@@ -36,7 +24,6 @@ interface Props {
 
 export const TicketSettings = ({ ticket, users }: Props) => {
   const { onClose, isOpen, onOpen } = useDisclosure();
-  console.log(ticket);
 
   return (
     <>
@@ -45,151 +32,9 @@ export const TicketSettings = ({ ticket, users }: Props) => {
         id_ticket={ticket.id_ticket}
         users={users}
       />
-      <div className="container mx-auto mt-8 flex justify-between items-center">
-        <h1>Ticket: {ticket.id_ticket}</h1>
-        <div className="flex gap-4">
-          <Button size="md" variant="bordered" radius="sm">
-            Actualizar
-          </Button>
-          <Button size="md" variant="bordered" radius="sm">
-            Resuelto
-          </Button>
-          <Button size="md" variant="bordered" radius="sm">
-            Eliminar
-          </Button>
-        </div>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 container mx-auto mt-6">
-        <div className="flex flex-col gap-4">
-          <div className="flex gap-6">
-            <div className="w-4/5 pr-10 flex items-center justify-end">
-              <label>ID</label>
-            </div>
-            <Input
-              aria-label="Tipo"
-              isDisabled
-              defaultValue={ticket.id_ticket}
-            />
-          </div>
 
-          <div className="flex gap-6">
-            <div className="w-4/5 pr-10 flex items-center justify-end">
-              <label>Tipo</label>
-            </div>
-            <Select defaultSelectedKeys={[ticket.tipo]}>
-              {Object.values(Tipo).map((tipo) => (
-                <SelectItem key={tipo} value={tipo}>
-                  {tipo}
-                </SelectItem>
-              ))}
-            </Select>
-          </div>
-
-          <div className="flex gap-6">
-            <div className="w-4/5 pr-10 flex items-center justify-end">
-              <label>Prioridad</label>
-            </div>
-            <Select defaultSelectedKeys={[ticket.prioridad]}>
-              {Object.values(Prioridad).map((prioridad) => (
-                <SelectItem key={prioridad} value={prioridad}>
-                  {prioridad}
-                </SelectItem>
-              ))}
-            </Select>
-          </div>
-
-          <div className="flex gap-6">
-            <div className="w-4/5 pr-10 flex items-center justify-end">
-              <label>Área</label>
-            </div>
-            <Select defaultSelectedKeys={[ticket.area]}>
-              {Object.values(TipoPregunta).map((area) => (
-                <SelectItem key={area} value={area}>
-                  {area}
-                </SelectItem>
-              ))}
-            </Select>
-          </div>
-
-          <div className="flex gap-6">
-            <div className="w-4/5 pr-10 flex items-center justify-end">
-              <label>Estado</label>
-            </div>
-            <Select defaultSelectedKeys={[ticket.estado]}>
-              {Object.values(EstadoTicket).map((estado) => (
-                <SelectItem key={estado} value={estado}>
-                  {estado}
-                </SelectItem>
-              ))}
-            </Select>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-4">
-          <div className="flex gap-6">
-            <div className="w-4/5 pr-10 flex items-center justify-end">
-              <label>Fecha de apertura</label>
-            </div>
-            <DatePicker
-              defaultValue={parseDate(
-                ticket.fecha_inicio.toString().split("T")[0]
-              )}
-              showMonthAndYearPickers
-            />
-          </div>
-
-          <div className="flex gap-6">
-            <div className="w-4/5 pr-10 flex items-center justify-end">
-              <label>Fecha de cierre</label>
-            </div>
-            <DatePicker
-              defaultValue={
-                ticket.fecha_cierre
-                  ? parseDate(ticket.fecha_cierre.toString().split("T")[0])
-                  : now(getLocalTimeZone())
-              }
-              showMonthAndYearPickers
-            />
-          </div>
-
-          <div className="flex gap-6">
-            <div className="w-4/5 pr-10 flex items-center justify-end">
-              <label>Usuario</label>
-            </div>
-            {ticket.user ? (
-              <Input
-                aria-label="Usuario"
-                isDisabled
-                defaultValue={ticket.user.nombre}
-              />
-            ) : (
-              <Input
-                aria-label="Usuario"
-                isDisabled
-                defaultValue={ticket.email}
-              />
-            )}
-          </div>
-
-          <div className="flex gap-6">
-            <div className="w-4/5 pr-10 flex items-center justify-end">
-              <label>Email del usuario</label>
-            </div>
-            {ticket.user ? (
-              <Input
-                aria-label="Email del usuario"
-                isDisabled
-                defaultValue={ticket.user.email}
-              />
-            ) : (
-              <Input
-                aria-label="Email"
-                isDisabled
-                defaultValue={ticket.email}
-              />
-            )}
-          </div>
-
+      <div className="container mx-auto mt-8">
+        <SettingsTicketForm ticket={ticket}>
           <div className="flex gap-6">
             <div className="w-4/5 pr-10 flex items-center justify-end">
               <label>Soporte asignado</label>
@@ -226,27 +71,9 @@ export const TicketSettings = ({ ticket, users }: Props) => {
               />
             )}
           </div>
-        </div>
+        </SettingsTicketForm>
       </div>
-      <div className="container mx-auto mt-8 flex flex-col gap-4">
-        <div className="flex gap-6">
-          <div className="w-1/5 pr-10 flex items-center justify-end">
-            <label>Motivo</label>
-          </div>
-          <Input aria-label="Motivo" defaultValue={ticket.motivo} />
-        </div>
 
-        <div className="flex gap-6">
-          <div className="w-1/5 pr-10 flex items-center justify-end">
-            <label>Descripción</label>
-          </div>
-          <Textarea
-            aria-label="Descripción"
-            defaultValue={ticket.descripcion}
-            rows={5}
-          />
-        </div>
-      </div>
       <div className="container mx-auto mt-8">
         <Tabs color="primary">
           <Tab title="Historial">
@@ -254,26 +81,19 @@ export const TicketSettings = ({ ticket, users }: Props) => {
               <CardHeader>Historial</CardHeader>
               <CardBody>
                 <>
-                  <TicketAnswer ticket={ticket} />
+                  <div className="w-full md:w-1/2 lg:w-1/4">
+                    <TicketAnswer ticket={ticket} />
+                  </div>
                   {!ticket.respuestas ? (
                     <div>
                       <h2>No hay respuestas</h2>
                     </div>
                   ) : (
                     <div>
-                      {ticket.respuestas.map((respuesta) => (
-                        <div
-                          key={respuesta.id_respuesta}
-                          className="flex gap-4"
-                        >
-                          <div>
-                            <h3>Respuesta</h3>
-                            <p>{respuesta.respuesta}</p>
-                          </div>
-                          <div>
-                            <h3>Fecha</h3>
-                            <p>{respuesta.fecha.toString()}</p>
-                          </div>
+                      {ticket.respuestas.map((answer) => (
+                        <div key={answer.id_respuesta} className="w-full">
+                          <TicketAnswers answer={answer} />
+                          <Divider className="my-4" />
                         </div>
                       ))}
                     </div>

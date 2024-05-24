@@ -88,13 +88,11 @@ export const getTicketById = async (
   }
 
   try {
-    const ticket = await prisma.ticket.findUnique({
-      where: {
-        id_ticket,
-      },
-    });
+    const { data } = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/ticket/${id_ticket}`
+    );
 
-    return ticket as unknown as ITicket;
+    return data as unknown as ITicket;
   } catch (error) {
     console.error(error);
     return;

@@ -1,12 +1,15 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getTicketsByUserSupport } from "@/actions/tickets";
 import { TableTickets } from "@/components";
 
 export default async function TicketsPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) return notFound();
+  if (session.user.id_rol === 1 || session.user.id_rol === 6) {
+    return redirect("/dashboard/admin");
+  }
 
   const tickets = await getTicketsByUserSupport(session?.user.id);
 
