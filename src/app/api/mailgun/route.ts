@@ -46,6 +46,9 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  console.log(body, "body");
+  console.log(html, "stripped-html");
+
   const answer = await prisma.ticketRespuestas.create({
     data: {
       respuesta:
