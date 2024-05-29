@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Button,
@@ -10,12 +10,18 @@ import {
   CardHeader,
   Divider,
   Input,
-} from "@nextui-org/react";
-import { TableModal } from "./TableModal";
-import { FaSearch } from "react-icons/fa";
-import { TicketAnswer, TicketAnswers, SettingsTicketForm } from "@/components";
+} from '@nextui-org/react';
+import { TableModal } from './TableModal';
+import { FaSearch } from 'react-icons/fa';
+import {
+  TicketAnswer,
+  TicketAnswers,
+  SettingsTicketForm,
+  TicketComments,
+  CommentTextArea,
+} from '@/components';
 
-import { ITicket, IUser } from "@/interfaces";
+import { ITicket, IUser } from '@/interfaces';
 
 interface Props {
   ticket: ITicket;
@@ -106,9 +112,25 @@ export const TicketSettings = ({ ticket, users }: Props) => {
             <Card>
               <CardHeader>Comentarios</CardHeader>
               <CardBody>
-                <div>
-                  <h2>Comentarios</h2>
-                </div>
+                <>
+                  <div className="w-full md:w-1/2 lg:w-1/4">
+                    <CommentTextArea ticket={ticket} />
+                  </div>
+                  {!ticket.comentarios ? (
+                    <div>
+                      <h2>No hay comentarios</h2>
+                    </div>
+                  ) : (
+                    <div>
+                      {ticket.comentarios.map((comment) => (
+                        <div key={comment.id_comentario} className="w-full">
+                          <TicketComments comment={comment} />
+                          <Divider className="my-4" />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
               </CardBody>
             </Card>
           </Tab>
@@ -118,9 +140,23 @@ export const TicketSettings = ({ ticket, users }: Props) => {
             </div>
           </Tab>
           <Tab title="Solución">
-            <div>
-              <h2>Solución</h2>
-            </div>
+            <Card>
+              <CardHeader>Solución</CardHeader>
+              <CardBody>
+                <div className="w-full md:w-1/2 lg:w-1/4">
+                  <CommentTextArea ticket={ticket} />
+                </div>
+                {ticket.respuesta ? (
+                  <div>
+                    <TicketAnswers answer={ticket.respuesta} />
+                  </div>
+                ) : (
+                  <div>
+                    <h2>No hay respuesta final</h2>
+                  </div>
+                )}
+              </CardBody>
+            </Card>
           </Tab>
         </Tabs>
       </div>

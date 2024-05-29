@@ -29,7 +29,7 @@ model Ticket {
   fecha_inicio DateTime
   fecha_cierre DateTime?
 
-  respuesta String? @db.Text
+  respuesta RespuestaFinal?
 
   comentarios TicketComentario[]
   respuestas  TicketRespuestas[]
@@ -62,6 +62,23 @@ model TicketComentario {
 
   comentario String   @db.Text
   fecha      DateTime
+
+  id_user String?
+
+  @@index([id_ticket])
+}
+
+model RespuestaFinal {
+  id_respuesta Int @id @default(autoincrement())
+
+  id_ticket String @unique
+  ticket    Ticket @relation(fields: [id_ticket], references: [id_ticket])
+
+  respuesta String   @db.Text
+  fecha     DateTime
+
+  id_user    String?
+  email_user String?
 
   @@index([id_ticket])
 }

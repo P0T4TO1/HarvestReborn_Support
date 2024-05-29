@@ -8,7 +8,6 @@ export async function POST(request: NextRequest) {
   const html = data.get("stripped-html");
   const body = data.get("body-plain");
   const from = data.get("from");
-  const attachment = data.get("attachment-1");
 
   if (!from) {
     return NextResponse.json({ error: "No Sender Provided" }, { status: 400 });

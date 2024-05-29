@@ -14,7 +14,7 @@ export interface ITicket {
   fecha_inicio: Date;
   fecha_cierre?: Date;
 
-  respuesta?: string;
+  respuesta?: IRespuestaFinal;
 
   comentarios?: ITicketComentario[];
   respuestas?: ITicketRespuesta[];
@@ -56,6 +56,19 @@ export interface ITicketComentario {
 }
 
 export interface ITicketRespuesta {
+  id_respuesta: string;
+
+  id_ticket: string;
+  ticket: ITicket;
+
+  respuesta: string;
+  fecha: Date;
+
+  id_user: string;
+  user: IUser;
+}
+
+export interface IRespuestaFinal {
   id_respuesta: string;
 
   id_ticket: string;

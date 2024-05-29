@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import prisma2 from "@/lib/prisma-second";
-import { ITicket } from "@/interfaces";
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+import prisma2 from '@/lib/prisma-second';
+import { ITicket } from '@/interfaces';
 
 async function getTicketById(
   request: Request,
@@ -12,7 +12,7 @@ async function getTicketById(
   const { id } = params;
   if (!id) {
     return NextResponse.json(
-      { error: "Ticket no encontrado" },
+      { error: 'Ticket no encontrado' },
       { status: 400 }
     );
   }
@@ -30,7 +30,7 @@ async function getTicketById(
 
     const userAnswer = await prisma2.m_user.findUnique({
       where: {
-        id: ticket?.id_user ?? "",
+        id: ticket?.id_user ?? '',
       },
       select: {
         duenonegocio: {
@@ -52,12 +52,19 @@ async function getTicketById(
         ...respuesta,
         user: userAnswer,
       })),
+      comentarios: ticket?.comentarios.map((comentario) => ({
+        ...comentario,
+        user: userAnswer,
+      })),
+      respuesta: {
+        user: userAnswer,
+      },
     } as ITicket;
 
     return NextResponse.json(ticketResponse, { status: 200 });
   } catch (error) {
     return NextResponse.json(
-      { error: "Error al buscar ticket" },
+      { error: 'Error al buscar ticket' },
       { status: 500 }
     );
   }

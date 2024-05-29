@@ -1,8 +1,8 @@
-import prisma from "@/lib/prisma";
-import axios, { AxiosError } from "axios";
+import prisma from '@/lib/prisma';
+import axios, { AxiosError } from 'axios';
 
-import { ITicket, IUser, ITicketRespuesta } from "@/interfaces";
-import { error } from "console";
+import { ITicket, IUser, ITicketRespuesta } from '@/interfaces';
+import { error } from 'console';
 
 export const revalidate = 3600;
 
@@ -49,16 +49,16 @@ export const createTicket = async (
       return;
     }
 
-    let prioridad = "";
+    let prioridad = '';
 
-    if (tipo === "INCIDENCIA") {
-      prioridad = "INMEDIATA";
-    } else if (tipo === "PETICION") {
-      prioridad = "BAJA";
-    } else if (tipo === "QUEJA") {
-      prioridad = "MEDIA";
-    } else if (tipo === "RECLAMACION") {
-      prioridad = "ALTA";
+    if (tipo === 'INCIDENCIA') {
+      prioridad = 'INMEDIATA';
+    } else if (tipo === 'PETICION') {
+      prioridad = 'BAJA';
+    } else if (tipo === 'QUEJA') {
+      prioridad = 'MEDIA';
+    } else if (tipo === 'RECLAMACION') {
+      prioridad = 'ALTA';
     }
 
     const { data } = await axios.post(
@@ -188,7 +188,65 @@ export const postAnswer = async (
     );
 
     if (status !== 200) {
-      return "Error al crear respuesta";
+      return 'Error al crear respuesta';
+    }
+
+    return data as unknown as ITicketRespuesta;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error(error.response?.data);
+      return;
+    }
+    console.error(error);
+    return;
+  }
+};
+
+export const postComment = async (
+  id_ticket: string,
+  comentario: string,
+  id_user: string
+) => {
+  try {
+    const { data, status } = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/ticket/comment/${id_ticket}`,
+      {
+        comentario,
+        id_user,
+      }
+    );
+
+    if (status !== 200) {
+      return 'Error al crear comentario';
+    }
+
+    return data as unknown as ITicketRespuesta;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error(error.response?.data);
+      return;
+    }
+    console.error(error);
+    return;
+  }
+};
+
+export const postFinalAnswer = async (
+  id_ticket: string,
+  respuesta: string,
+  id_user: string
+) => {
+  try {
+    const { data, status } = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/ticket/answer/final/${id_ticket}`,
+      {
+        respuesta,
+        id_user,
+      }
+    );
+
+    if (status !== 200) {
+      return 'Error al crear respuesta';
     }
 
     return data as unknown as ITicketRespuesta;
