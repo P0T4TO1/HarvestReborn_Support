@@ -44,7 +44,7 @@ export const NewTicketNotification = ({ email, userName, ticket }: Props) => (
           <Text style={paragraph}>Nombre: {userName}</Text>
           <Text style={paragraph}>Correo: {email}</Text>
           <Text style={paragraph}>No. de ticket: {ticket.id_ticket}</Text>
-          <Text style={paragraph}>Descripcion: {ticket.descripcion}</Text>
+          <Text style={paragraph}>Descripción: {ticket.descripcion}</Text>
         </Section>
         {userName.includes("@") ? null : (
           <Section style={btnContainer}>

@@ -39,7 +39,9 @@ export const TicketAnswerEmail = ({ ticket, answer }: Props) => (
         </Text>
         <Section>
           <Text style={paragraph}>No. de ticket: {ticket.id_ticket}</Text>
+          <Text style={paragraph}>Descripción: {ticket.descripcion}</Text>
         </Section>
+        <Hr style={hr} />
         <Text style={paragraph}>
           Si tiene alguna pregunta o necesita más información, no dude en
           responder a este correo electrónico.
