@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
         respuesta:
           body.toString().split("________________________________")[0] ?? "",
         id_ticket:
-          body.toString().split("No. de ticket: ")[1].split("Descripción")[0] ?? "",
+          body.toString().split("No. de ticket: ")[1].split("/nDescripción")[0] ?? "",
         fecha: now(getLocalTimeZone()).toDate(),
         email_user: sender,
       },
@@ -46,15 +46,12 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  console.log(body, "body");
-  console.log(html, "stripped-html");
-
   const answer = await prisma.ticketRespuestas.create({
     data: {
       respuesta:
         body.toString().split("________________________________")[0] ?? "",
       id_ticket:
-        body.toString().split("No. de ticket: ")[1].split("Descripción")[0] ?? "",
+        body.toString().split("No. de ticket: ")[1].split("/nDescripción")[0] ?? "",
       fecha: now(getLocalTimeZone()).toDate(),
       id_user: user.id ?? "",
     },
