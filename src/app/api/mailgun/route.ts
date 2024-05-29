@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
       respuesta:
         body.toString().split("________________________________")[0] ?? "",
       id_ticket:
-        body.toString().split("No. de ticket: ")[1].split(" ")[0] ?? "",
+        body.toString().split("No. de ticket: ")[1].split("Si")[0] ?? "",
       fecha: now(getLocalTimeZone()).toDate(),
       id_user: user.id ?? "",
     },
