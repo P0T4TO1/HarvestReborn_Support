@@ -38,8 +38,8 @@ export async function POST(request: NextRequest) {
           body
             .toString()
             .split("No. de ticket: ")[1]
-            .replace(/[\n\r]+/g, " ")
-            .split(" Descripción")[0] ?? "",
+            .split("Descripción")[0]
+            .replace(/[\n\r]+/g, "") ?? "",
         fecha: now(getLocalTimeZone()).toDate(),
         email_user: sender,
       },
@@ -58,8 +58,8 @@ export async function POST(request: NextRequest) {
         body
           .toString()
           .split("No. de ticket: ")[1]
-          .replace(/[\n\r]+/g, " ")
-          .split(" Descripción")[0] ?? "",
+          .split("Descripción")[0]
+          .replace(/[\n\r]+/g, "") ?? "",
       fecha: now(getLocalTimeZone()).toDate(),
       id_user: user.id ?? "",
     },
