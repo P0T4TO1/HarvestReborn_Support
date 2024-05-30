@@ -1,10 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma2 from "@/lib/prisma-second";
+import { NextRequest, NextResponse } from 'next/server';
+import prisma2 from '@/lib/prisma-second';
 
 async function getAllUsersSupport(req: NextRequest) {
   const users = await prisma2.m_user.findMany({
     where: {
-      id_rol: 5,
+      OR: [
+        {
+          id_rol: 5,
+        },
+        {
+          id_rol: 6,
+        },
+      ],
     },
     include: {
       cliente: {
@@ -26,11 +33,11 @@ async function getAllUsersSupport(req: NextRequest) {
     return {
       id: user.id,
       nombre:
-        user.cliente?.nombre_cliente ?? user.duenonegocio?.nombre_dueneg ?? "",
+        user.cliente?.nombre_cliente ?? user.duenonegocio?.nombre_dueneg ?? '',
       apellidos:
         user.cliente?.apellidos_cliente ??
         user.duenonegocio?.apellidos_dueneg ??
-        "",
+        '',
       email: user.email,
     };
   });

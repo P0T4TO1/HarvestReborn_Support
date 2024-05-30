@@ -8,7 +8,7 @@ export interface IRespuestas {
 }
 
 export interface IPreguntas {
-  id_prefec: number;
+  id_prefrec: number;
   
   pregunta: string;
 

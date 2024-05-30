@@ -1,5 +1,7 @@
 'use client';
 
+import { useSession } from 'next-auth/react';
+
 import {
   Button,
   Tab,
@@ -11,15 +13,16 @@ import {
   Divider,
   Input,
 } from '@nextui-org/react';
-import { TableModal } from './TableModal';
-import { FaSearch } from 'react-icons/fa';
+
 import {
   TicketAnswer,
   TicketAnswers,
   SettingsTicketForm,
   TicketComments,
   CommentTextArea,
+  TableModal,
 } from '@/components';
+import { FaSearch } from 'react-icons/fa';
 
 import { ITicket, IUser } from '@/interfaces';
 
@@ -30,6 +33,7 @@ interface Props {
 
 export const TicketSettings = ({ ticket, users }: Props) => {
   const { onClose, isOpen, onOpen } = useDisclosure();
+  const { data: session } = useSession();
 
   return (
     <>
@@ -45,10 +49,14 @@ export const TicketSettings = ({ ticket, users }: Props) => {
             <div className="w-4/5 pr-10 flex items-center justify-end">
               <label>Soporte asignado</label>
             </div>
-            {ticket.user_soporte ? (
+            {session?.user.id_rol === 1 || session?.user.id_rol === 6 ? (
               <Input
                 aria-label="Soporte"
-                defaultValue={ticket.user_soporte.nombre}
+                defaultValue={
+                  ticket.user_soporte
+                    ? ticket.user_soporte.nombre
+                    : 'No asignado'
+                }
                 endContent={
                   <Button
                     size="sm"
@@ -63,17 +71,13 @@ export const TicketSettings = ({ ticket, users }: Props) => {
             ) : (
               <Input
                 aria-label="Soporte"
-                defaultValue="No asignado"
-                endContent={
-                  <Button
-                    size="sm"
-                    variant="light"
-                    isIconOnly
-                    onPress={() => onOpen()}
-                  >
-                    <FaSearch size={21} />
-                  </Button>
+                defaultValue={
+                  ticket.user_soporte
+                    ? ticket.user_soporte.nombre
+                    : 'No asignado'
                 }
+                readOnly
+                isDisabled
               />
             )}
           </div>

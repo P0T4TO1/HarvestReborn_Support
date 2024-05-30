@@ -1,2 +1,2 @@
-export * from "./AllTicketsAdmin";
+export * from "./AllTickets";
 export * from "./UsersSupport";

@@ -99,9 +99,7 @@ export const getTicketById = async (
   }
 };
 
-export const getTicketByIdForAdmin = async (
-  id_ticket: string
-): Promise<ITicket | undefined> => {
+export const getTicketByIdForAdmin = async (id_ticket: string) => {
   if (!id_ticket) {
     return;
   }
@@ -118,7 +116,7 @@ export const getTicketByIdForAdmin = async (
   }
 };
 
-export const getAllTickets = async (): Promise<ITicket[] | undefined> => {
+export const getAllTickets = async () => {
   try {
     const { data } = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/ticket`
@@ -134,7 +132,7 @@ export const getAllTickets = async (): Promise<ITicket[] | undefined> => {
   }
 };
 
-export const getUsersSupport = async (): Promise<IUser[] | undefined> => {
+export const getUsersSupport = async () => {
   try {
     const { data } = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/admin/users`
@@ -250,6 +248,27 @@ export const postFinalAnswer = async (
     }
 
     return data as unknown as ITicketRespuesta;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error(error.response?.data);
+      return;
+    }
+    console.error(error);
+    return;
+  }
+};
+
+export const deleteTicket = async (id_ticket: string) => {
+  try {
+    const { status } = await axios.delete(
+      `${process.env.NEXT_PUBLIC_API_URL}/ticket/${id_ticket}`
+    );
+
+    if (status !== 200) {
+      return 'Error al eliminar ticket';
+    }
+
+    return 'Ticket eliminado correctamente';
   } catch (error) {
     if (error instanceof AxiosError) {
       console.error(error.response?.data);

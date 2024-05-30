@@ -23,7 +23,12 @@ export const TicketComments = ({ comment }: Props) => {
             })}
           </p>
         </div>
-        <p>{comment.comentario}</p>
+        {comment.comentario.split(/(?:\r\n|\r|\n)/g).map((item) => (
+          <>
+            {item}
+            <br />
+          </>
+        ))}
       </div>
     </>
   );

@@ -70,4 +70,34 @@ async function getTicketById(
   }
 }
 
-export { getTicketById as GET };
+async function deleteTicket(
+  request: Request,
+  { params }: { params: { id: string } },
+  req: NextRequest,
+  res: NextResponse
+) {
+  const { id } = params;
+  if (!id) {
+    return NextResponse.json(
+      { error: 'Ticket no encontrado' },
+      { status: 400 }
+    );
+  }
+
+  try {
+    await prisma.ticket.delete({
+      where: {
+        id_ticket: id,
+      },
+    });
+
+    return NextResponse.json({ success: true }, { status: 200 });
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Error al eliminar ticket' },
+      { status: 500 }
+    );
+  }
+}
+
+export { getTicketById as GET, deleteTicket as DELETE };

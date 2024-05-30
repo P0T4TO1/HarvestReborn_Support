@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useMemo, useCallback, Key } from "react";
+import { useState, useMemo, useCallback, Key } from 'react';
 import {
   Table,
   TableHeader,
@@ -20,63 +20,33 @@ import {
   Tooltip,
   Chip,
   ChipProps,
-} from "@nextui-org/react";
-import { FaChevronDown, FaEdit, FaRegTrashAlt, FaSearch } from "react-icons/fa";
+} from '@nextui-org/react';
+import { FaChevronDown, FaEdit, FaRegTrashAlt, FaSearch } from 'react-icons/fa';
+import {
+  columnsTableFAQ as columns,
+  typeFAQOptions as typeOptions,
+  typeFAQColorMap as typeColorMap,
+} from '@/utils';
 
-import { IPreguntas } from "@/interfaces";
+import { IPreguntas } from '@/interfaces';
 
-const columns = [
-  { name: "ID", uid: "id_prefac", sortable: true },
-  { name: "Pregunta", uid: "pregunta", sortable: true },
-  { name: "Tipo", uid: "tipo", sortable: true },
-  { name: "Acciones", uid: "actions" },
-];
-
-const INITIAL_VISIBLE_COLUMNS = ["id_prefac", "pregunta", "tipo", "actions"];
-
-const tipoOptions = [
-  { name: "General", uid: "GENERAL" },
-  { name: "Cuenta", uid: "CUENTA" },
-  { name: "Negocio", uid: "NEGOCIO" },
-  { name: "Cliente", uid: "CLIENTE" },
-  { name: "Dueño de negocio", uid: "DUENONEGOCIO" },
-  { name: "Ordenes", uid: "ORDENES" },
-  { name: "Productos", uid: "PRODUCTOS" },
-  { name: "Inventario", uid: "INVENTARIO" },
-  { name: "Chat", uid: "CHAT" },
-  { name: "Publicaciones", uid: "PUBLICACIONES" },
-  { name: "Técnico", uid: "TECNICO" },
-];
-
-const tipoColorMap = {
-  GENERAL: "gray",
-  CUENTA: "blue",
-  NEGOCIO: "green",
-  CLIENTE: "orange",
-  DUENONEGOCIO: "purple",
-  ORDENES: "red",
-  PRODUCTOS: "cyan",
-  INVENTARIO: "pink",
-  CHAT: "yellow",
-  PUBLICACIONES: "teal",
-  TECNICO: "indigo",
-};
+const INITIAL_VISIBLE_COLUMNS = ['id_prefrec', 'pregunta', 'tipo', 'actions'];
 
 interface TableFaqsProps {
   questions: IPreguntas[];
 }
 
 export const TableFaq = ({ questions }: TableFaqsProps) => {
-  const [filterValue, setFilterValue] = useState("");
+  const [filterValue, setFilterValue] = useState('');
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
   const [visibleColumns, setVisibleColumns] = useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
-  const [typeFilter, setTypeFilter] = useState<Selection>("all");
+  const [typeFilter, setTypeFilter] = useState<Selection>('all');
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-    column: "tipo",
-    direction: "ascending",
+    column: 'tipo',
+    direction: 'ascending',
   });
 
   const [page, setPage] = useState(1);
@@ -84,7 +54,7 @@ export const TableFaq = ({ questions }: TableFaqsProps) => {
   const hasSearchFilter = Boolean(filterValue);
 
   const headerColumns = useMemo(() => {
-    if (visibleColumns === "all") return columns;
+    if (visibleColumns === 'all') return columns;
 
     return columns.filter((column) =>
       Array.from(visibleColumns).includes(column.uid)
@@ -100,8 +70,8 @@ export const TableFaq = ({ questions }: TableFaqsProps) => {
       );
     }
     if (
-      typeFilter !== "all" &&
-      Array.from(typeFilter).length !== tipoOptions.length
+      typeFilter !== 'all' &&
+      Array.from(typeFilter).length !== typeOptions.length
     ) {
       filteredQuestions = filteredQuestions.filter((question) =>
         Array.from(typeFilter).includes(question.tipo)
@@ -125,16 +95,16 @@ export const TableFaq = ({ questions }: TableFaqsProps) => {
 
     return items.sort((a, b) => {
       if (
-        (a[column as keyof IPreguntas] ?? "") <
-        (b[column as keyof IPreguntas] ?? "")
+        (a[column as keyof IPreguntas] ?? '') <
+        (b[column as keyof IPreguntas] ?? '')
       ) {
-        return direction === "ascending" ? -1 : 1;
+        return direction === 'ascending' ? -1 : 1;
       }
       if (
-        (a[column as keyof IPreguntas] ?? "") >
-        (b[column as keyof IPreguntas] ?? "")
+        (a[column as keyof IPreguntas] ?? '') >
+        (b[column as keyof IPreguntas] ?? '')
       ) {
-        return direction === "ascending" ? 1 : -1;
+        return direction === 'ascending' ? 1 : -1;
       }
       return 0;
     });
@@ -144,21 +114,23 @@ export const TableFaq = ({ questions }: TableFaqsProps) => {
     const cellValue = question[columnKey as keyof IPreguntas];
 
     switch (columnKey) {
-      case "id_prefac":
+      case 'id_prefrec':
         return cellValue;
-      case "pregunta":
+      case 'pregunta':
         return cellValue;
-      case "tipo":
+      case 'tipo':
         return (
           <Chip
-            size="sm"
-            color={tipoColorMap[question.tipo] as ChipProps["color"]}
-            variant="flat"
+            size="md"
+            classNames={{
+              base: `bg-${typeColorMap[question.tipo]}-600 bg-opacity-20`,
+              content: `text-${typeColorMap[question.tipo]}-600`,
+            }}
           >
             {question.tipo.charAt(0) + question.tipo.slice(1).toLowerCase()}
           </Chip>
         );
-      case "actions":
+      case 'actions':
         return (
           <div className="flex gap-2">
             <Tooltip content="Editar" placement="top">
@@ -195,12 +167,12 @@ export const TableFaq = ({ questions }: TableFaqsProps) => {
       setFilterValue(value);
       setPage(1);
     } else {
-      setFilterValue("");
+      setFilterValue('');
     }
   }, []);
 
   const onClear = useCallback(() => {
-    setFilterValue("");
+    setFilterValue('');
     setPage(1);
   }, []);
 
@@ -232,7 +204,7 @@ export const TableFaq = ({ questions }: TableFaqsProps) => {
                 selectionMode="multiple"
                 onSelectionChange={setTypeFilter}
               >
-                {tipoOptions.map((status) => (
+                {typeOptions.map((status) => (
                   <DropdownItem key={status.uid} className="capitalize">
                     {status.name}
                   </DropdownItem>
@@ -269,14 +241,21 @@ export const TableFaq = ({ questions }: TableFaqsProps) => {
         </div>
       </div>
     );
-  }, [filterValue, visibleColumns, onSearchChange, questions.length, onClear, typeFilter]);
+  }, [
+    filterValue,
+    visibleColumns,
+    onSearchChange,
+    questions.length,
+    onClear,
+    typeFilter,
+  ]);
 
   const bottomContent = useMemo(() => {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
         <span className="w-[30%] text-small text-default-400">
-          {selectedKeys === "all"
-            ? "Todos los clientes seleccionados"
+          {selectedKeys === 'all'
+            ? 'Todos los clientes seleccionados'
             : `${selectedKeys.size} de ${filteredItems.length} clientes seleccionados`}
         </span>
         <Pagination
@@ -336,16 +315,16 @@ export const TableFaq = ({ questions }: TableFaqsProps) => {
           {(column) => (
             <TableColumn
               key={column.uid}
-              align={column.uid === "actions" ? "center" : "start"}
+              align={column.uid === 'actions' ? 'center' : 'start'}
               allowsSorting={column.sortable}
             >
               {column.name}
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody emptyContent={"No hay preguntas 😭"} items={sortedItems}>
+        <TableBody emptyContent={'No hay preguntas 😭'} items={sortedItems}>
           {(item) => (
-            <TableRow key={item.id_prefec}>
+            <TableRow key={item.id_prefrec}>
               {(columnKey) => (
                 <TableCell>{renderCell(item, columnKey) as any}</TableCell>
               )}

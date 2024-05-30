@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { EstadoTicket } from "@/interfaces";
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+import { EstadoTicket } from '@/interfaces';
+import { now, getLocalTimeZone } from '@internationalized/date';
 
 async function changeStatusTicket(
   request: Request,
@@ -11,12 +12,17 @@ async function changeStatusTicket(
   const { id } = params;
   if (!id) {
     return NextResponse.json(
-      { error: "Ticket no encontrado" },
+      { error: 'Ticket no encontrado' },
       { status: 400 }
     );
   }
 
   const { estado } = (await request.json()) as { estado: string };
+
+  let fechaCierre = null;
+  if (estado === EstadoTicket.CERRADO) {
+    fechaCierre = now(getLocalTimeZone()).toDate();
+  }
 
   try {
     const updatedTicket = await prisma.ticket.update({
@@ -25,13 +31,14 @@ async function changeStatusTicket(
       },
       data: {
         estado: estado as EstadoTicket,
+        fecha_cierre: fechaCierre,
       },
     });
 
     return NextResponse.json(updatedTicket, { status: 200 });
   } catch (error) {
     return NextResponse.json(
-      { error: "Error al actualizar ticket" },
+      { error: 'Error al actualizar ticket' },
       { status: 500 }
     );
   }

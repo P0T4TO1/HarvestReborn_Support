@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import { IPreguntas } from "@/interfaces";
 
-export const getQuestions = async (): Promise<IPreguntas[]> => {
+export const getQuestions = async ()=> {
   try {
     const questions = (await prisma.preguntasFrecuentes.findMany({
       include: {
@@ -12,6 +12,6 @@ export const getQuestions = async (): Promise<IPreguntas[]> => {
     return questions;
   } catch (error) {
     console.error(error);
-    return [];
+    return;
   }
 };

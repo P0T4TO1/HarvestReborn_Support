@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useMemo, useCallback, Key } from "react";
+import { useState, useMemo, useCallback, Key } from 'react';
 
 import {
   Table,
@@ -22,12 +22,14 @@ import {
   Chip,
   ChipProps,
   Link,
-} from "@nextui-org/react";
+  useDisclosure,
+} from '@nextui-org/react';
+import { DeleteTicketModal } from '../modals';
 
-import { MdPriorityHigh, MdLowPriority } from "react-icons/md";
-import { CgChevronDoubleDownR } from "react-icons/cg";
-import { PiDotsThreeCircleDuotone } from "react-icons/pi";
-import { FaChevronDown, FaRegTrashAlt, FaSearch } from "react-icons/fa";
+import { CgChevronDoubleDownR } from 'react-icons/cg';
+import { PiDotsThreeCircleDuotone } from 'react-icons/pi';
+import { MdPriorityHigh, MdLowPriority } from 'react-icons/md';
+import { FaChevronDown, FaRegTrashAlt, FaSearch } from 'react-icons/fa';
 
 import {
   columnsTableTickets as columns,
@@ -37,8 +39,8 @@ import {
   typeOptions,
   priorityColorMap,
   priorityOptions,
-} from "@/utils";
-import { ITicket } from "@/interfaces";
+} from '@/utils';
+import { ITicket } from '@/interfaces';
 
 interface Props {
   tickets: ITicket[];
@@ -46,35 +48,37 @@ interface Props {
 }
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "id_ticket",
-  "estado",
-  "tipo",
-  "prioridad",
-  "fecha_inicio",
-  "acciones",
+  'id_ticket',
+  'estado',
+  'tipo',
+  'prioridad',
+  'fecha_inicio',
+  'acciones',
 ];
 
 export const TableTickets = ({ tickets, id_role }: Props) => {
-  const [filterValue, setFilterValue] = useState("");
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [filterValue, setFilterValue] = useState('');
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
   const [visibleColumns, setVisibleColumns] = useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
-  const [statusFilter, setStatusFilter] = useState<Selection>("all");
-  const [typeFilter, setTypeFilter] = useState<Selection>("all");
-  const [priorityFilter, setPriorityFilter] = useState<Selection>("all");
+  const [statusFilter, setStatusFilter] = useState<Selection>('all');
+  const [typeFilter, setTypeFilter] = useState<Selection>('all');
+  const [priorityFilter, setPriorityFilter] = useState<Selection>('all');
   const rowsPerPage = 10;
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-    column: "fecha_inicio",
-    direction: "ascending",
+    column: 'fecha_inicio',
+    direction: 'ascending',
   });
+  const [idTicket, setIdTicket] = useState<string | undefined>(undefined);
 
   const [page, setPage] = useState(1);
 
   const hasSearchFilter = Boolean(filterValue);
 
   const headerColumns = useMemo(() => {
-    if (visibleColumns === "all") return columns;
+    if (visibleColumns === 'all') return columns;
 
     return columns.filter((column) =>
       Array.from(visibleColumns).includes(column.uid)
@@ -90,7 +94,7 @@ export const TableTickets = ({ tickets, id_role }: Props) => {
       );
     }
     if (
-      statusFilter !== "all" &&
+      statusFilter !== 'all' &&
       Array.from(statusFilter).length !== statusOptions.length
     ) {
       filteredTickets = filteredTickets.filter((ticket) =>
@@ -98,7 +102,7 @@ export const TableTickets = ({ tickets, id_role }: Props) => {
       );
     }
     if (
-      typeFilter !== "all" &&
+      typeFilter !== 'all' &&
       Array.from(typeFilter).length !== typeOptions.length
     ) {
       filteredTickets = filteredTickets.filter((ticket) =>
@@ -106,7 +110,7 @@ export const TableTickets = ({ tickets, id_role }: Props) => {
       );
     }
     if (
-      priorityFilter !== "all" &&
+      priorityFilter !== 'all' &&
       Array.from(priorityFilter).length !== priorityOptions.length
     ) {
       filteredTickets = filteredTickets.filter((ticket) =>
@@ -138,14 +142,14 @@ export const TableTickets = ({ tickets, id_role }: Props) => {
 
     return items.sort((a, b) => {
       if (
-        (a[column as keyof ITicket] ?? "") < (b[column as keyof ITicket] ?? "")
+        (a[column as keyof ITicket] ?? '') < (b[column as keyof ITicket] ?? '')
       ) {
-        return direction === "ascending" ? -1 : 1;
+        return direction === 'ascending' ? -1 : 1;
       }
       if (
-        (a[column as keyof ITicket] ?? "") > (b[column as keyof ITicket] ?? "")
+        (a[column as keyof ITicket] ?? '') > (b[column as keyof ITicket] ?? '')
       ) {
-        return direction === "ascending" ? 1 : -1;
+        return direction === 'ascending' ? 1 : -1;
       }
       return 0;
     });
@@ -155,7 +159,7 @@ export const TableTickets = ({ tickets, id_role }: Props) => {
     const cellValue = ticket[columnKey as keyof ITicket];
 
     switch (columnKey) {
-      case "id_ticket":
+      case 'id_ticket':
         return (
           <>
             {id_role === 1 || id_role === 6 ? (
@@ -179,38 +183,38 @@ export const TableTickets = ({ tickets, id_role }: Props) => {
             )}
           </>
         );
-      case "tipo":
+      case 'tipo':
         return (
           <Chip
             size="sm"
             variant="dot"
-            color={typeColorMap[ticket.tipo] as ChipProps["color"]}
+            color={typeColorMap[ticket.tipo] as ChipProps['color']}
           >
             {ticket.tipo}
           </Chip>
         );
-      case "estado":
+      case 'estado':
         return (
           <Chip
             size="sm"
             variant="flat"
-            color={statusColorMap[ticket.estado] as ChipProps["color"]}
+            color={statusColorMap[ticket.estado] as ChipProps['color']}
           >
             {ticket.estado}
           </Chip>
         );
-      case "prioridad":
+      case 'prioridad':
         return (
           <Chip
             size="sm"
             variant="flat"
-            color={priorityColorMap[ticket.prioridad] as ChipProps["color"]}
+            color={priorityColorMap[ticket.prioridad] as ChipProps['color']}
             startContent={
-              ticket.prioridad === "INMEDIATA" ? (
+              ticket.prioridad === 'INMEDIATA' ? (
                 <MdPriorityHigh />
-              ) : ticket.prioridad === "BAJA" ? (
+              ) : ticket.prioridad === 'BAJA' ? (
                 <MdLowPriority />
-              ) : ticket.prioridad === "MEDIA" ? (
+              ) : ticket.prioridad === 'MEDIA' ? (
                 <PiDotsThreeCircleDuotone />
               ) : (
                 <CgChevronDoubleDownR />
@@ -220,24 +224,32 @@ export const TableTickets = ({ tickets, id_role }: Props) => {
             {ticket.prioridad}
           </Chip>
         );
-      case "fecha_inicio":
+      case 'fecha_inicio':
         return (
           <>
             {new Date(ticket.fecha_inicio.toString()).toLocaleDateString(
-              "es-MX",
+              'es-MX',
               {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
               }
             )}
           </>
         );
-      case "acciones":
+      case 'acciones':
         return (
           <div className="flex items-center gap-4">
             <Tooltip content="Eliminar">
-              <Button variant="light" color="danger" isIconOnly>
+              <Button
+                variant="light"
+                color="danger"
+                isIconOnly
+                onPress={() => {
+                  setIdTicket(ticket.id_ticket);
+                  onOpen();
+                }}
+              >
                 <FaRegTrashAlt size={20} />
               </Button>
             </Tooltip>
@@ -265,12 +277,12 @@ export const TableTickets = ({ tickets, id_role }: Props) => {
       setFilterValue(value);
       setPage(1);
     } else {
-      setFilterValue("");
+      setFilterValue('');
     }
   }, []);
 
   const onClear = useCallback(() => {
-    setFilterValue("");
+    setFilterValue('');
     setPage(1);
   }, []);
 
@@ -396,8 +408,8 @@ export const TableTickets = ({ tickets, id_role }: Props) => {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
         <span className="w-[30%] text-small text-default-400">
-          {selectedKeys === "all"
-            ? "Todos los tickets seleccionados"
+          {selectedKeys === 'all'
+            ? 'Todos los tickets seleccionados'
             : `${selectedKeys.size} de ${filteredItems.length} tickets seleccionados`}
         </span>
         <Pagination
@@ -439,39 +451,47 @@ export const TableTickets = ({ tickets, id_role }: Props) => {
   ]);
 
   return (
-    <div className=" w-full flex flex-col gap-4">
-      <Table
-        aria-label="Example table with custom cells, pagination and sorting"
-        isHeaderSticky
-        bottomContent={bottomContent}
-        bottomContentPlacement="outside"
-        sortDescriptor={sortDescriptor}
-        topContent={topContent}
-        topContentPlacement="outside"
-        onSelectionChange={setSelectedKeys}
-        onSortChange={setSortDescriptor}
-      >
-        <TableHeader columns={headerColumns}>
-          {(column) => (
-            <TableColumn
-              key={column.uid}
-              align={column.uid === "actions" ? "center" : "start"}
-              allowsSorting={column.sortable}
-            >
-              {column.name}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody emptyContent={"No hay tickets 😭"} items={sortedItems}>
-          {(item) => (
-            <TableRow key={item.id_ticket}>
-              {(columnKey) => (
-                <TableCell>{renderCell(item, columnKey) as any}</TableCell>
-              )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
+    <>
+      {idTicket && (
+        <DeleteTicketModal
+          useDisclosure={{ isOpen, onClose }}
+          id_ticket={idTicket}
+        />
+      )}
+      <div className=" w-full flex flex-col gap-4">
+        <Table
+          aria-label="Example table with custom cells, pagination and sorting"
+          isHeaderSticky
+          bottomContent={bottomContent}
+          bottomContentPlacement="outside"
+          sortDescriptor={sortDescriptor}
+          topContent={topContent}
+          topContentPlacement="outside"
+          onSelectionChange={setSelectedKeys}
+          onSortChange={setSortDescriptor}
+        >
+          <TableHeader columns={headerColumns}>
+            {(column) => (
+              <TableColumn
+                key={column.uid}
+                align={column.uid === 'actions' ? 'center' : 'start'}
+                allowsSorting={column.sortable}
+              >
+                {column.name}
+              </TableColumn>
+            )}
+          </TableHeader>
+          <TableBody emptyContent={'No hay tickets 😭'} items={sortedItems}>
+            {(item) => (
+              <TableRow key={item.id_ticket}>
+                {(columnKey) => (
+                  <TableCell>{renderCell(item, columnKey) as any}</TableCell>
+                )}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </>
   );
 };

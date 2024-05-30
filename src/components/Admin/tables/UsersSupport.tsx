@@ -1,6 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useMemo, useCallback, Key } from "react";
+import { useState, useMemo, useCallback, Key } from 'react';
+import { useSession } from 'next-auth/react';
 
 import {
   Table,
@@ -18,17 +19,16 @@ import {
   Pagination,
   Selection,
   SortDescriptor,
-  Link,
-} from "@nextui-org/react";
-import { toast } from "sonner";
-import { FaChevronDown, FaSearch } from "react-icons/fa";
-import { DANGER_TOAST, SUCCESS_TOAST } from "@/components/ui";
+} from '@nextui-org/react';
+import { toast } from 'sonner';
+import { FaChevronDown, FaSearch } from 'react-icons/fa';
+import { DANGER_TOAST, SUCCESS_TOAST } from '@/components/ui';
 
-import { IUser } from "@/interfaces";
-import { hrSupportApi } from "@/api";
-import { columnsTableUsers as columns } from "@/utils";
+import { IUser } from '@/interfaces';
+import { hrSupportApi } from '@/api';
+import { columnsTableUsers as columns } from '@/utils';
 
-const INITIAL_VISIBLE_COLUMNS = ["id", "nombre", "apellidos", "email"];
+const INITIAL_VISIBLE_COLUMNS = ['id', 'nombre', 'apellidos', 'email'];
 
 interface Props {
   users: IUser[];
@@ -36,16 +36,17 @@ interface Props {
 }
 
 export const UsersSupport = ({ users, id_ticket }: Props) => {
+  const { data: session } = useSession();
   const [isLoading, setIsLoading] = useState(false);
-  const [filterValue, setFilterValue] = useState("");
+  const [filterValue, setFilterValue] = useState('');
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
   const [visibleColumns, setVisibleColumns] = useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
   const rowsPerPage = 10;
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-    column: "nombre",
-    direction: "ascending",
+    column: 'nombre',
+    direction: 'ascending',
   });
 
   const [page, setPage] = useState(1);
@@ -53,7 +54,7 @@ export const UsersSupport = ({ users, id_ticket }: Props) => {
   const hasSearchFilter = Boolean(filterValue);
 
   const headerColumns = useMemo(() => {
-    if (visibleColumns === "all") return columns;
+    if (visibleColumns === 'all') return columns;
 
     return columns.filter((column) =>
       Array.from(visibleColumns).includes(column.uid)
@@ -85,11 +86,11 @@ export const UsersSupport = ({ users, id_ticket }: Props) => {
     const { column, direction } = sortDescriptor;
 
     return items.sort((a, b) => {
-      if ((a[column as keyof IUser] ?? "") < (b[column as keyof IUser] ?? "")) {
-        return direction === "ascending" ? -1 : 1;
+      if ((a[column as keyof IUser] ?? '') < (b[column as keyof IUser] ?? '')) {
+        return direction === 'ascending' ? -1 : 1;
       }
-      if ((a[column as keyof IUser] ?? "") > (b[column as keyof IUser] ?? "")) {
-        return direction === "ascending" ? 1 : -1;
+      if ((a[column as keyof IUser] ?? '') > (b[column as keyof IUser] ?? '')) {
+        return direction === 'ascending' ? 1 : -1;
       }
       return 0;
     });
@@ -99,23 +100,23 @@ export const UsersSupport = ({ users, id_ticket }: Props) => {
     setIsLoading(true);
     try {
       hrSupportApi
-        .put("/admin/tickets/assign", {
+        .put('/admin/tickets/assign', {
           id_user_support: id_user,
           id_ticket,
         })
         .then((response) => {
           console.log(response);
-          toast("Usuario asignado correctamente", SUCCESS_TOAST);
+          toast('Usuario asignado correctamente', SUCCESS_TOAST);
           window.location.reload();
         })
         .catch((error) => {
           console.log(error);
-          toast("Error al asignar el usuario", DANGER_TOAST);
+          toast('Error al asignar el usuario', DANGER_TOAST);
           setIsLoading(false);
         });
     } catch (error) {
       console.error(error);
-      toast("Error al asignar el usuario", DANGER_TOAST);
+      toast('Error al asignar el usuario', DANGER_TOAST);
       setIsLoading(false);
     }
   };
@@ -124,7 +125,7 @@ export const UsersSupport = ({ users, id_ticket }: Props) => {
     const cellValue = user[columnKey as keyof IUser];
 
     switch (columnKey) {
-      case "id":
+      case 'id':
         return (
           <Button
             variant="light"
@@ -134,11 +135,15 @@ export const UsersSupport = ({ users, id_ticket }: Props) => {
             {user.id}
           </Button>
         );
-      case "nombre":
-        return <>{user.nombre}</>;
-      case "apellidos":
+      case 'nombre':
+        return (
+          <>
+            {user.id === session?.user.id ? `${user.nombre}(Yo)` : user.nombre}
+          </>
+        );
+      case 'apellidos':
         return <>{user.apellidos}</>;
-      case "email":
+      case 'email':
         return <>{user.email}</>;
       default:
         return cellValue;
@@ -162,12 +167,12 @@ export const UsersSupport = ({ users, id_ticket }: Props) => {
       setFilterValue(value);
       setPage(1);
     } else {
-      setFilterValue("");
+      setFilterValue('');
     }
   }, []);
 
   const onClear = useCallback(() => {
-    setFilterValue("");
+    setFilterValue('');
     setPage(1);
   }, []);
 
@@ -221,8 +226,8 @@ export const UsersSupport = ({ users, id_ticket }: Props) => {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
         <span className="w-[30%] text-small text-default-400">
-          {selectedKeys === "all"
-            ? "Todos los usuarios seleccionados"
+          {selectedKeys === 'all'
+            ? 'Todos los usuarios seleccionados'
             : `${selectedKeys.size} de ${filteredItems.length} usuarios seleccionados`}
         </span>
         <Pagination
@@ -285,14 +290,14 @@ export const UsersSupport = ({ users, id_ticket }: Props) => {
           {(column) => (
             <TableColumn
               key={column.uid}
-              align={column.uid === "actions" ? "center" : "start"}
+              align={column.uid === 'actions' ? 'center' : 'start'}
               allowsSorting={column.sortable}
             >
               {column.name}
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody emptyContent={"No hay usuarios 😭"} items={sortedItems}>
+        <TableBody emptyContent={'No hay usuarios 😭'} items={sortedItems}>
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
