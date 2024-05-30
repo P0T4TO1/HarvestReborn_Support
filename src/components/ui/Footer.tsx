@@ -78,7 +78,7 @@ export const Footer = () => {
                     <li>
                       <Link
                         className="font-semibold mb-2 text-sm"
-                        href={`${process.env.NEXT_PUBLIC_APP_URL}/negocios`}
+                        href={`${process.env.NEXT_PUBLIC_APP_URL}/stores`}
                         color="foreground"
                       >
                         Recauderías
