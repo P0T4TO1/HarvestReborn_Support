@@ -402,7 +402,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\angel\\Harvest\\HarvestReborn_Support\\src\\generated\\client",
+      "value": "C:\\Users\\jaret\\Harvest\\HarvestReborn_Support\\src\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -419,7 +419,7 @@ const config = {
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": "../../../.env",
+    "rootEnvPath": null,
     "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../../../prisma-second",

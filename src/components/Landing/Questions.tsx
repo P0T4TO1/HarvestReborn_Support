@@ -17,7 +17,7 @@ export const Questions: React.FC<Props> = ({ preguntas }) => {
         <Accordion>
           {preguntas.map((pregunta) => (
             <AccordionItem
-              key={pregunta.id_prefec}
+              key={pregunta.id_prefrec}
               title={pregunta.pregunta}
               startContent={<FaQuestion size={21} />}
             >

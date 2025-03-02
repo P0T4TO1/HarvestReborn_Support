@@ -28,7 +28,7 @@ export default async function Home() {
     return (
       <>
         <NavbarComponent />
-        <HomeSupport name={dueneg?.nombre_dueneg ?? ""} questions={questions} />
+        <HomeSupport name={dueneg?.nombre_dueneg ?? ""} questions={questions ?? []} />
         <Footer />
       </>
     );
@@ -49,7 +49,7 @@ export default async function Home() {
         <NavbarComponent />
         <HomeSupport
           name={cliente?.nombre_cliente ?? ""}
-          questions={questions}
+          questions={questions ?? []}
         />
         <Footer />
       </>
@@ -59,7 +59,7 @@ export default async function Home() {
   return (
     <>
       <NavbarComponent />
-      <HomeSupport questions={questions} />
+      <HomeSupport questions={questions ?? []} />
       <Footer />
     </>
   );
